@@ -1,0 +1,26 @@
+{
+  "name": "lanternwake",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "packageManager": "pnpm@12.8.1",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4317",
+    "build": "tsc -b && vite build && node scripts/build-cache.mjs",
+    "check": "tsc -b && node --test tests/*.test.ts",
+    "test": "node --test tests/*.test.ts",
+    "test:e2e": "playwright test",
+    "start": "node scripts/serve.mjs"
+  },
+  "dependencies": { "phaser": "3.90.0", "react": "19.3.0", "react-dom": "19.3.0" },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.10.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.1"
+  }
+}
