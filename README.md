@@ -49,13 +49,14 @@ the game. Foreground return needs a deliberate resume.
 ```sh
 pnpm check       # TypeScript + 11 deterministic unit/property tests
 pnpm build      # Production assets + content-versioned offline cache
-pnpm test:e2e   # Four full Chromium interaction tests, one worker
+pnpm test:e2e   # Five full Chromium interaction tests, one worker
 ```
 
 Install a browser only if it is absent: `pnpm exec playwright install chromium`.
 All four room solutions run through actual keyboard input in browser tests.
 The tests also cover touch controls, pause/reset/undo, echo recovery, sound
-opt-in, validated saves, reduced motion, and offline reload with artwork.
+opt-in, validated saves, reduced motion, offline reload with artwork, and
+keyboard focus/Escape behavior in pause and completion dialogs.
 
 [Gameplay clip](evidence/lanternwake-demo.webm) · [Mobile screenshot](evidence/mobile.png)
 · [Research and concept comparison](docs/research.md) · [QA evidence](docs/verification.md)

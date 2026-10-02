@@ -25,7 +25,7 @@ bundle exceeds its generic 500 kB advisory. It is not an error; reducing cold
 load weight remains a future optimization. The content-versioned service
 worker precaches six app/art files.
 
-`pnpm test:e2e`: **4/4 Chromium tests** pass with one worker:
+`pnpm test:e2e`: **5/5 Chromium tests** pass with one worker:
 
 | Browser check | Evidence / observed result |
 | --- | --- |
@@ -38,6 +38,7 @@ worker precaches six app/art files.
 | Audio | User-gesture enable toggles sound and activates its audio context; human listening not performed. |
 | Offline | Wait for cache readiness, set browser network offline, reload, recover saved echo, render actual art and finish room. |
 | Mobile | 390×844, reduced motion, real touch-control clicks, room completion, hint/journal flow, no document horizontal overflow. |
+| Modal keyboard access | Tab/Shift+Tab stay inside the pause/completion controls, Escape resumes pause, completion remains visible, and backgrounding a completed room cannot stack two game dialogs. |
 | Screenshots | Native concept viewport 1536×1024 desktop plus full-page mobile capture. |
 
 The IAB/CUA entry point failed with **Transport closed**. Playwright Chromium
@@ -87,8 +88,21 @@ runtime remain untested. Canvas fallback may show opacity without the WebGL
 echo tint. The game has keyboard and labeled touch controls; it has not had a
 complete screen-reader gameplay audit.
 
-No production infrastructure or public demo was created. Private GitHub
-publication requires a reachable repository creation route: local `gh` has
-an invalid existing token and native CUA cannot connect. Credentials were
-not changed. Parent progress sends through the native Codex tool also fail
-with Transport closed despite healthy shell, Playwright and Library access.
+No production infrastructure or public demo was created. Source was published
+to the [private Lanternwake repository](https://github.com/aranlucas/lanternwake)
+using the existing GitHub keyring session with approved host network access;
+private visibility and the exact remote commit were verified. The initial
+sandbox authentication check could not use that network route. Credentials
+were not changed. Native Mac app transport initially blocked browser entry
+and parent progress messages; those connections later recovered, and the local
+HTTP `/health` endpoint was confirmed healthy.
+
+## Draft PR follow-up: accessible game dialogs
+
+The initial prototype is preserved on main. A genuine follow-up replaces the
+pause and completion overlays with native modal dialogs. This keeps keyboard
+focus inside the open dialog and makes the rest of the game inert. Escape
+resumes a paused game, while a completion dialog remains until its next-room
+or journal action is chosen. Keyboard game commands cannot run behind any
+open dialog, and backgrounding a completed room cannot stack a second pause
+dialog over its completion screen. Browser tests verify these behaviors.

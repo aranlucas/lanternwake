@@ -38,7 +38,9 @@ nav { display: flex; gap: 13px; }
 .bridge-rhythm { margin: 0 auto 13px; color: #b8cdd4; font-size: 13px; }
 .bridge-rhythm span { color: #a4e4ed; }
 .loading { position: absolute; inset: 0; display: grid; place-items: center; font: 26px Georgia, serif; background: #0b2330; z-index: 1; }
-.pause-overlay, .win-overlay { position: absolute; z-index: 4; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; background: #05182372; backdrop-filter: blur(3px); }
+.game-dialog { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; border: 0; padding: 24px; color: inherit; background: transparent; }
+.game-dialog[open] { display: flex; align-items: center; justify-content: center; }
+.game-dialog::backdrop { background: #05182372; backdrop-filter: blur(3px); }
 .pause-card, .win-card { width: min(480px, 100%); text-align: center; padding: 42px 36px; background: #0a202ce8; border: 1px solid #acbbbd55; border-radius: 18px; box-shadow: 0 20px 100px #0006; }
 h2 { margin: 12px 0 16px; font: 400 34px/1.13 Georgia, serif; color: #f6dfb9; }
 .pause-card p, .win-card p { margin: 0 0 24px; color: #ccd4d7; font: 17px/1.6 Georgia, serif; }
@@ -85,7 +87,7 @@ h2 { margin: 12px 0 16px; font: 400 34px/1.13 Georgia, serif; color: #f6dfb9; }
   .direction:active { background: #345464; }
   .direction.up { grid-column: 2; } .direction.left { grid-row: 2; grid-column: 1; } .direction.down { grid-row: 2; grid-column: 2; } .direction.right { grid-row: 2; grid-column: 3; }
   .quiet-footer { margin-top: 16px; font-size: 12px; justify-content: center; } .key-help { display: none; }
-  .pause-overlay, .win-overlay { position: fixed; } .win-card, .pause-card { padding: 33px 24px; }
+  .win-card, .pause-card { padding: 33px 24px; }
   .journal { padding: 32px 23px; } .journal h2 { font-size: 29px; } .chapter-list button { gap: 13px; font-size: 18px; padding-inline: 5px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
