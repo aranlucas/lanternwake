@@ -78,3 +78,30 @@ test("mobile touch controls finish a room and reduced-motion layout does not ove
   await expect(page.locator(".hint")).toBeVisible(); await page.getByRole("button", { name: "Back to the garden" }).click();
   await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
 });
+
+test("native game dialogs contain focus and Escape resumes only the pause screen", async ({ page }) => {
+  await open(page); await steps(page, ["right"]);
+  await page.getByRole("button", { name: "Pause game" }).click();
+  const resume = page.getByRole("button", { name: "Keep wandering" });
+  await expect(resume).toBeFocused();
+  await page.keyboard.press("Tab");
+  expect(await page.evaluate(() => !!document.activeElement?.closest("dialog[open]"))).toBe(true);
+  await page.keyboard.press("Shift+Tab");
+  expect(await page.evaluate(() => !!document.activeElement?.closest("dialog[open]"))).toBe(true);
+  await page.keyboard.press("r"); await expect(page.getByTestId("state")).toHaveAttribute("data-echoes", "0");
+  await page.keyboard.press("Escape"); await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
+  await page.getByRole("button", { name: "Restart", exact: true }).click();
+  await steps(page, LEVELS[0].solutions[0]); await page.keyboard.press("r"); await steps(page, LEVELS[0].solutions[1]);
+  await expect(page.getByRole("button", { name: "The next little moment" })).toBeFocused();
+  await page.keyboard.press("Tab"); await expect(page.getByRole("button", { name: "Open the journal", exact: true })).toBeFocused();
+  await page.keyboard.press("Tab");
+  expect(await page.evaluate(() => !!document.activeElement?.closest("dialog[open]"))).toBe(true);
+  await page.keyboard.press("Escape"); await expect(page.getByRole("dialog", { name: "A little more morning." })).toBeVisible();
+  await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
+  await page.evaluate(() => { Object.defineProperty(document, "hidden", { configurable: true, get: () => true }); document.dispatchEvent(new Event("visibilitychange")); });
+  await expect(page.locator("dialog.game-dialog[open]")).toHaveCount(1);
+  await page.evaluate(() => { Object.defineProperty(document, "hidden", { configurable: true, get: () => false }); });
+  await page.getByRole("button", { name: "The next little moment" }).click();
+  await expect(page.getByTestId("state")).toHaveAttribute("data-level", "wishes");
+  await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
+});

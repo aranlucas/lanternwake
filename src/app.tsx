@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { BeatLine } from "./components/beat-line.tsx";
 import { Controls } from "./components/controls.tsx";
+import { GameDialog } from "./components/game-dialog.tsx";
 import { GameWorld } from "./components/game-world.tsx";
 import { Icon } from "./components/icon.tsx";
 import { Journal } from "./components/journal.tsx";
@@ -27,7 +28,7 @@ export default function App() {
   const closeJournal = () => { setJournal(false); setShowHint(false); resume(); };
   useEffect(() => {
     const keys = (event: KeyboardEvent) => {
-      if (journal || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (journal || document.querySelector("dialog[open]") || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
       const target = event.target as HTMLElement;
       if (target.matches("input, textarea, select, [contenteditable=true]")) return;
       const directions: Record<string, Direction> = { ArrowUp: "up", w: "up", ArrowDown: "down", s: "down", ArrowLeft: "left", a: "left", ArrowRight: "right", d: "right" };
@@ -63,8 +64,8 @@ export default function App() {
       <div className="quiet-footer"><span>{offline ? cacheReady ? "Offline · the garden is with you" : "Offline" : cacheReady ? "Ready for offline play" : "A little company, whenever you need it."}</span><span className="key-help">Move: arrows or WASD · Rewind: R · Wait: Space</span></div>
       {!storageAvailable && <p className="save-warning">This browser cannot save your place. You can still play this visit.</p>}
     </div>
-    {state.paused && !journal && <div className="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title"><div className="pause-card"><Icon name="lantern" size={40} /><h2 id="pause-title">The garden can wait.</h2><p>Your echoes are right where you left them.</p><button className="resume-button" autoFocus onClick={resume}>Keep wandering</button></div></div>}
-    {state.won && <div className="win-overlay" role="dialog" aria-modal="true" aria-labelledby="win-title"><div className="win-card"><span className="win-symbol">☼</span><h2 id="win-title">{final ? "You brought the morning." : "A little more morning."}</h2><p>{level.story}</p><button className="resume-button" autoFocus onClick={() => chooseLevel(final ? LEVELS[0].id : LEVELS[chapter + 1].id)}>{final ? "Wander again" : "The next little moment"}<Icon name="right" /></button><button className="text-button" onClick={() => { act({ type: "pause", value: true }); setJournal(true); }}>Open the journal</button></div></div>}
+    {state.paused && !state.won && !journal && <GameDialog labelId="pause-title" onDismiss={resume}><div className="pause-card"><Icon name="lantern" size={40} /><h2 id="pause-title">The garden can wait.</h2><p>Your echoes are right where you left them.</p><button className="resume-button" autoFocus onClick={resume}>Keep wandering</button></div></GameDialog>}
+    {state.won && <GameDialog labelId="win-title"><div className="win-card"><span className="win-symbol">☼</span><h2 id="win-title">{final ? "You brought the morning." : "A little more morning."}</h2><p>{level.story}</p><button className="resume-button" autoFocus onClick={() => { resume(); chooseLevel(final ? LEVELS[0].id : LEVELS[chapter + 1].id); }}>{final ? "Wander again" : "The next little moment"}<Icon name="right" /></button><button className="text-button" onClick={() => { act({ type: "pause", value: true }); setJournal(true); }}>Open the journal</button></div></GameDialog>}
     {journal && <Journal level={level} completed={completed} hint={level.hints[Math.min(state.echoes.length, level.hints.length - 1)]} showHint={showHint} onHint={() => setShowHint(true)} onClose={closeJournal} onChoose={id => { chooseLevel(id); setJournal(false); setShowHint(false); }} />}
     <div className="state-proof" data-testid="state" data-beat={state.beat} data-echoes={state.echoes.length} data-level={state.levelId} data-x={position.x} data-y={position.y} data-won={state.won} data-paused={state.paused} hidden />
   </main>;
