@@ -12,7 +12,7 @@ export function Journal({ level, completed, hint, showHint, onHint, onClose, onC
     <h2 id="journal-title">A few borrowed moments</h2><p className="journal-intro">Walk a path. Rewind. Your echo walks it again, then waits where you left it. Every move is one beat for everyone.</p>
     <ol className="chapter-list">{LEVELS.map((room, i) => <li key={room.id}><button className={level.id === room.id ? "selected" : ""} onClick={() => onChoose(room.id)}><span className="chapter-number">0{i + 1}</span><span>{room.title}<small>{room.subtitle}</small></span><span className="chapter-complete">{completed.includes(room.id) ? "Completed" : level.id === room.id ? "Here now" : "Visit"}</span></button></li>)}</ol>
     <div className="journal-help"><p>There is no rush. The garden waits when you do. Undo a step with Z. Rewind with R. Use Space to wait. Taking back an echo lets you edit that path.</p><button onClick={onHint}>A gentle nudge</button>{showHint && <p className="hint" role="status">{hint}</p>}</div>
-    <p className="private-note">Made to be played quietly. Progress stays on this device. No accounts or network calls during play.</p>
+    <p className="private-note">With sound on, your footsteps become a tune. Each echo carries it in a different voice. Wait to listen; resting echoes stay quiet. Progress stays on this device.</p>
     <button className="resume-button" onClick={onClose}>Back to the garden</button>
   </dialog>;
 }

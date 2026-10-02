@@ -4,6 +4,8 @@ import { LEVELS } from "../src/game/levels.ts";
 import type { Direction } from "../src/game/types.ts";
 
 const keys: Record<Direction, string> = { up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", wait: "Space" };
+type AudioTrace = { contexts: AudioContext[]; starts: { frequency: number; waveform: OscillatorType }[]; active: Set<OscillatorNode>; maxActive: number };
+declare global { interface Window { audioTrace: AudioTrace } }
 async function open(page: Page) { await page.goto("/"); await expect(page.locator(".world-ready")).toHaveAttribute("data-ready", "true"); }
 async function steps(page: Page, path: Direction[]) {
   for (const direction of path) {
@@ -104,4 +106,72 @@ test("native game dialogs contain focus and Escape resumes only the pause screen
   await page.getByRole("button", { name: "The next little moment" }).click();
   await expect(page.getByTestId("state")).toHaveAttribute("data-level", "wishes");
   await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
+});
+
+test("real Web Audio plays recorded echo voices only after opt-in and stops on pause or mute", async ({ page }) => {
+  const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
+  await page.addInitScript(() => {
+    const trace: AudioTrace = { contexts: [], starts: [], active: new Set(), maxActive: 0 };
+    window.audioTrace = trace;
+    const NativeAudioContext = window.AudioContext;
+    window.AudioContext = new Proxy(NativeAudioContext, {
+      construct(target, args) {
+        const context = Reflect.construct(target, args) as AudioContext;
+        trace.contexts.push(context);
+        const create = context.createOscillator.bind(context);
+        context.createOscillator = () => {
+          const oscillator = create(), start = oscillator.start.bind(oscillator), disconnect = oscillator.disconnect.bind(oscillator);
+          oscillator.start = (when = 0) => {
+            trace.starts.push({ frequency: oscillator.frequency.value, waveform: oscillator.type });
+            trace.active.add(oscillator); trace.maxActive = Math.max(trace.maxActive, trace.active.size);
+            start(when);
+          };
+          oscillator.disconnect = () => { trace.active.delete(oscillator); disconnect(); };
+          return oscillator;
+        };
+        return context;
+      },
+    });
+  });
+  await open(page); await steps(page, ["right"]);
+  expect(await page.evaluate(() => window.audioTrace.contexts.length)).toBe(0);
+  await page.getByRole("button", { name: "Enable sound" }).click();
+  await expect.poll(() => page.evaluate(() => window.audioTrace.starts.length)).toBe(3);
+  await page.evaluate(() => { window.audioTrace.starts = []; });
+  await steps(page, ["right"]);
+  const keeper = await page.evaluate(() => window.audioTrace.starts);
+  expect(keeper).toHaveLength(1); expect(keeper[0].waveform).toBe("triangle");
+  await page.keyboard.press("r"); await page.evaluate(() => { window.audioTrace.starts = []; (document.activeElement as HTMLElement).blur(); });
+  await steps(page, ["wait", "wait"]);
+  const echoes = await page.evaluate(() => window.audioTrace.starts);
+  expect(echoes).toHaveLength(2); expect(echoes[1].waveform).toBe("sine");
+  expect(echoes[1].frequency).toBeCloseTo(keeper[0].frequency * 2, 3);
+  await steps(page, ["wait"]);
+  expect(await page.evaluate(() => window.audioTrace.starts.length)).toBe(2);
+  await page.getByRole("button", { name: "Pause game" }).click();
+  await expect.poll(() => page.evaluate(() => window.audioTrace.contexts[0].state)).toBe("suspended");
+  expect(await page.evaluate(() => window.audioTrace.active.size)).toBe(0);
+  await page.getByRole("button", { name: "Keep wandering" }).click();
+  await expect.poll(() => page.evaluate(() => window.audioTrace.contexts[0].state)).toBe("running");
+  // Many immediate actions exercise the voice cap before their envelopes can finish.
+  await page.evaluate(() => {
+    for (let i = 0; i < 70; i++) document.body.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: i % 2 ? "ArrowLeft" : "ArrowRight" }));
+  });
+  expect(await page.evaluate(() => window.audioTrace.maxActive)).toBe(16);
+  await page.getByRole("button", { name: "Mute sound" }).click();
+  await expect.poll(() => page.evaluate(() => window.audioTrace.contexts[0].state)).toBe("suspended");
+  expect(await page.evaluate(() => window.audioTrace.active.size)).toBe(0);
+  const mutedCount = await page.evaluate(() => window.audioTrace.starts.length);
+  await page.keyboard.press("ArrowLeft");
+  expect(await page.evaluate(() => window.audioTrace.starts.length)).toBe(mutedCount);
+  await page.getByRole("button", { name: "Enable sound" }).click();
+  await page.getByRole("button", { name: "Open journal", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.audioTrace.contexts[0].state)).toBe("suspended");
+  await page.getByRole("button", { name: /Two wishes/ }).click();
+  await expect.poll(() => page.evaluate(() => window.audioTrace.contexts[0].state)).toBe("running");
+  await page.evaluate(() => { window.audioTrace.starts = []; }); await steps(page, ["right"]);
+  expect(await page.evaluate(() => window.audioTrace.starts.length)).toBe(1);
+  await page.reload(); await expect(page.getByRole("button", { name: "Enable sound" })).toBeVisible();
+  expect(await page.evaluate(() => window.audioTrace.contexts.length)).toBe(0);
+  expect(errors).toEqual([]);
 });

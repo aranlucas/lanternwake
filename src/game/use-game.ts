@@ -22,13 +22,20 @@ export function useGame() {
   const act = useCallback((action: GameAction) => {
     const before = current.current, after = transition(levelById(before.levelId), before, action);
     current.current = after; setState(after);
-    if (action.type === "step") audio.current?.play(after.won ? "win" : after.beat > before.beat ? "step" : "blocked");
+    if (action.type === "step" && !before.paused && !before.won) {
+      audio.current?.playStep(before, after);
+      if (after.won) audio.current?.play("win");
+      else if (after.beat === before.beat) audio.current?.play("blocked");
+    }
     if (action.type === "rewind" && after.echoes.length > before.echoes.length) audio.current?.play("rewind");
+    if (action.type === "pause" && action.value) void audio.current?.suspend();
+    if (action.type === "restart") audio.current?.silence();
   }, []);
-  const chooseLevel = useCallback((id: string) => { const next = initialState(levelById(id)); current.current = next; setState(next); }, []);
+  const chooseLevel = useCallback((id: string) => { const next = initialState(levelById(id)); current.current = next; setState(next); void audio.current?.resume(); }, []);
   const toggleSound = async () => {
-    const value = !sound;
-    try { await audio.current?.enable(value); setSound(value); } catch { setSound(false); }
+    const value = !audio.current?.enabled;
+    setSound(value);
+    try { await audio.current?.enable(value); } catch { setSound(false); }
   };
   useEffect(() => {
     if (state.won) setCompleted(previous => previous.includes(state.levelId) ? previous : [...previous, state.levelId]);
@@ -38,7 +45,7 @@ export function useGame() {
     catch { setStorageAvailable(false); }
   }, [state, completed, sound]);
   useEffect(() => {
-    const visibility = () => { if (document.hidden) { act({ type: "pause", value: true }); void audio.current?.suspend(); } };
+    const visibility = () => { if (document.hidden) act({ type: "pause", value: true }); };
     document.addEventListener("visibilitychange", visibility);
     return () => document.removeEventListener("visibilitychange", visibility);
   }, [act]);

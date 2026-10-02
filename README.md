@@ -10,8 +10,8 @@ a minute; later rooms need two or three echoes and a bridge with its own rhythm.
 ![An echo holds the moon pad while you cross the gate](evidence/first-echo.png)
 
 Four authored rooms, original generated winter artwork, keyboard and touch
-controls, step undo, echo recovery, a journal with gentle hints, optional short
-sound cues, local saves, and a versioned offline cache. No accounts, analytics,
+controls, step undo, echo recovery, a journal with gentle hints, an optional
+musical echo choir, local saves, and a versioned offline cache. No accounts, analytics,
 AI requests, or remote gameplay services.
 
 ## Play locally
@@ -35,6 +35,10 @@ Move with arrow keys or WASD. **R** rewinds and leaves an echo, **Space** waits,
 buttons; a neighboring stone can also be clicked or tapped. Enable sound using
 the upper-right sound button. Sound starts muted after each page load.
 
+With sound enabled, stepping stones become notes. Each echo repeats your tune
+in its own register and stereo position. Wait to hear moving echoes on their
+own; resting echoes stay silent. [Hear a real two-echo solution](evidence/echo-choir.wav).
+
 The clock moves only when you do. A blocked move costs no beat. Echoes repeat
 recorded positions and hold their endpoint. The moon bridge is bright on beats
 2–3 of each four-beat cycle; entering it uses the **next** beat. Standing on it
@@ -47,9 +51,9 @@ the game. Foreground return needs a deliberate resume.
 ## Verification
 
 ```sh
-pnpm check       # TypeScript + 11 deterministic unit/property tests
+pnpm check       # TypeScript + 15 deterministic unit/property tests
 pnpm build      # Production assets + content-versioned offline cache
-pnpm test:e2e   # Five full Chromium interaction tests, one worker
+pnpm test:e2e   # Six full Chromium interaction tests, one worker
 ```
 
 Install a browser only if it is absent: `pnpm exec playwright install chromium`.
@@ -57,6 +61,8 @@ All four room solutions run through actual keyboard input in browser tests.
 The tests also cover touch controls, pause/reset/undo, echo recovery, sound
 opt-in, validated saves, reduced motion, offline reload with artwork, and
 keyboard focus/Escape behavior in pause and completion dialogs.
+The audio test observes real oscillator pitches, gesture-only creation,
+echo replay, mute/pause cleanup, and the limit on simultaneous voices.
 
 [Gameplay clip](evidence/lanternwake-demo.webm) · [Mobile screenshot](evidence/mobile.png)
 · [Research and concept comparison](docs/research.md) · [QA evidence](docs/verification.md)
@@ -64,6 +70,7 @@ keyboard focus/Escape behavior in pause and completion dialogs.
 ## Structure
 
 - `src/game/simulation.ts`: pure deterministic transition rules.
+- `src/game/music.ts`: pure route-to-note composition; `audio.ts` synthesizes it locally.
 - `src/game/levels.ts`: authored maps, dependencies, hints, and verified solutions.
 - `src/game/renderer.ts`: Phaser scene, original atlas frames, movement tweens.
 - `src/game/storage.ts`: save validation by replaying each stored path.

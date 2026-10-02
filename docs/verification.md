@@ -13,19 +13,21 @@ pnpm check
 pnpm build
 pnpm test:e2e
 node scripts/capture-demo.mjs
+node scripts/capture-choir.mjs
 ```
 
-`pnpm check`: TypeScript passes and **11/11 unit/property tests** pass, including
+`pnpm check`: TypeScript passes and **15/15 unit/property tests** pass, including
 all four authored solutions, gate occupancy, echo endpoint replay, bridge
 timing, pause/reset/undo/echo recovery, bounded paths, malformed/forged save
-rejection, and repeatability across 400 seeded actions per room.
+rejection, repeatability across 400 seeded actions per room, exact echo melody
+replay, stationary-actor silence, invalid-action silence and four-voice cooperation.
 
 `pnpm build`: passes. Vite warns that the Phaser-containing 1.44 MB JavaScript
 bundle exceeds its generic 500 kB advisory. It is not an error; reducing cold
 load weight remains a future optimization. The content-versioned service
 worker precaches six app/art files.
 
-`pnpm test:e2e`: **5/5 Chromium tests** pass with one worker:
+`pnpm test:e2e`: **6/6 Chromium tests** pass with one worker:
 
 | Browser check | Evidence / observed result |
 | --- | --- |
@@ -35,7 +37,7 @@ worker precaches six app/art files.
 | Core first echo | Walk onto pad, rewind, echo repeats and holds endpoint, gate opens, player reaches bell. |
 | Reversibility | Undo step, take back echo, pause/resume, restart all update actual state. |
 | Foreground/background | Visibility-change handler pauses input and sound; explicit foreground resume permits movement. Handler exercised deterministically; not a physical OS lifecycle test. |
-| Audio | User-gesture enable toggles sound and activates its audio context; human listening not performed. |
+| Audio | No AudioContext before opt-in. Real oscillator starts verify recorded melody at an octave offset, silence while echoes hold, and distinct keeper/echo waveforms. Pause/mute suspend the context and disconnect every active node. A burst of 70 input events stays within 16 simultaneous voices; reload starts muted. Human listening not performed. |
 | Offline | Wait for cache readiness, set browser network offline, reload, recover saved echo, render actual art and finish room. |
 | Mobile | 390×844, reduced motion, real touch-control clicks, room completion, hint/journal flow, no document horizontal overflow. |
 | Modal keyboard access | Tab/Shift+Tab stay inside the pause/completion controls, Escape resumes pause, completion remains visible, and backgrounding a completed room cannot stack two game dialogs. |
@@ -78,6 +80,7 @@ mobile controls differ intentionally so the game actually works.
 - `evidence/mobile.png`: touch-ready responsive view.
 - `evidence/morning.png`: completed final room.
 - `evidence/lanternwake-demo.webm`: short real gameplay recording.
+- `evidence/echo-choir.wav`: real synthesizer output from a complete two-echo room; 48 kHz stereo PCM, checked for nonzero signal. Reproduce with `node scripts/capture-choir.mjs` while the local server runs. No microphone is accessed.
 
 Library saves succeeded for the first-echo screenshot, mobile screenshot and
 video. Exact Library identifiers are provided separately to the parent for
@@ -97,7 +100,7 @@ were not changed. Native Mac app transport initially blocked browser entry
 and parent progress messages; those connections later recovered, and the local
 HTTP `/health` endpoint was confirmed healthy.
 
-## Draft PR follow-up: accessible game dialogs
+## Merged follow-up: accessible game dialogs
 
 The initial prototype is preserved on main. A genuine follow-up replaces the
 pause and completion overlays with native modal dialogs. This keeps keyboard
@@ -106,3 +109,17 @@ resumes a paused game, while a completion dialog remains until its next-room
 or journal action is chosen. Keyboard game commands cannot run behind any
 open dialog, and backgrounding a completed room cannot stack a second pause
 dialog over its completion screen. Browser tests verify these behaviors.
+
+[PR #1](https://github.com/aranlucas/lanternwake/pull/1) merged using normal
+repository protections at `55580f2e67075cc6bf15e2c02baa3c0946c0c066` after
+local checks and explicit authorization. The repository has no hosted CI;
+there is no hosted-check success claim or public deployment.
+
+## Musical follow-up
+
+The opt-in echo choir is covered by four pure composition tests and the sixth
+browser scenario. Muting or opening a pause/journal modal immediately stops
+voices. Choosing a room from the journal resumes the existing opted-in context.
+The capture script records that actual browser path and synthesizer graph,
+then decodes its output to a portable WAV. Audio envelopes, stereo placement
+and performance on physical devices still need human evaluation.

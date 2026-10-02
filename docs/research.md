@@ -59,15 +59,31 @@ so the installed v3 definitions remain authoritative for this prototype.
 All rooms have authored solution paths tested independently and through browser
 controls. There is no procedural filler or simulated victory screen.
 
+## Overnight follow-up: an echo choir
+
+The musical-canon experiment is now tangible. Each moving keeper or echo plays
+a note derived from its destination stone in a C-major pentatonic scale. Echoes
+repeat the recorded melody in distinct registers, with quiet envelopes and
+stereo positions. Waiting leaves the moving echoes audible; held endpoints are
+silent. The composition uses the same accepted discrete transitions as the
+puzzle, so it adds no timing dependence to the game rules.
+
+Four new deterministic tests verify replayed melody, silence, invalid actions
+and four-voice cooperation. A real Web Audio browser check observes the actual
+oscillator frequencies and lifecycle. `evidence/echo-choir.wav` records a real
+two-echo room solution directly from the app's synthesizer. It uses no samples,
+microphone, model or remote service. Human listening and artistic balance are
+still the next useful evaluation; technical correctness is not proof of delight.
+
 ## Concrete next experiments
 
 - Watch three fresh players for 60 seconds. Do they independently discover
   **pad → rewind → gate**? If not, animate a two-step footprint hint rather than add prose.
 - Add one optional “passing the light” room where an echo must leave a pad at
   a specific beat. Keep earlier rooms forgiving; verify the intended time window.
-- Turn completed routes into a small musical canon: each echo plays a different
-  instrument on each move. The same deterministic route can drive both the game
-  and a short original musical keepsake.
+- Let a fresh player compare muted play with the echo choir, then test a small
+  completion keepsake that replays their paths at a chosen tempo. Keep opt-in
+  sound and avoid rewarding aimless extra steps just to generate more notes.
 - Build a five-stone pocket editor with local puzzle codes. Test whether sending
   a tiny authored garden is fun before adding multiplayer, accounts, or hosting.
 
