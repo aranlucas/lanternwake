@@ -4,10 +4,20 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 async function files(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
 
-  return (await Promise.all(entries.map(async entry => entry.isDirectory() ? files(`${dir}/${entry.name}`) : `${dir}/${entry.name}`))).flat();
+  return (
+    await Promise.all(
+      entries.map(async (entry) =>
+        entry.isDirectory()
+          ? files(`${dir}/${entry.name}`)
+          : `${dir}/${entry.name}`,
+      ),
+    )
+  ).flat();
 }
 
-const paths = (await files("dist")).filter(path => !path.endsWith("sw.js")).sort();
+const paths = (await files("dist"))
+  .filter((path) => !path.endsWith("sw.js"))
+  .sort();
 
 const hash = createHash("sha256");
 
@@ -15,7 +25,7 @@ for (const path of paths) hash.update(await readFile(path));
 
 const version = hash.digest("hex").slice(0, 12);
 
-const urls = paths.map(path => `/${path.slice(5)}`);
+const urls = paths.map((path) => `/${path.slice(5)}`);
 
 const source = `const CACHE = "lanternwake-${version}";
 const FILES = ${JSON.stringify(urls)};
@@ -29,5 +39,4 @@ self.addEventListener("fetch", event => {
 
 await writeFile("dist/sw.js", source);
 
- console.log(`Offline cache ${version}: ${urls.length} local files`);
-
+console.log(`Offline cache ${version}: ${urls.length} local files`);
