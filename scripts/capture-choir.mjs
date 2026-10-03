@@ -4,6 +4,7 @@ import { LEVELS } from "../src/game/levels.ts";
 
 // Record the application's real synthesizer output; no microphone or external audio.
 const browser = await chromium.launch();
+
 try {
   const page = await browser.newPage();
   await page.addInitScript(() => {
@@ -14,11 +15,16 @@ try {
         const create = context.createStereoPanner.bind(context);
         context.createStereoPanner = () => {
           const pan = create(), connect = pan.connect.bind(pan);
-          pan.connect = destination => { connect(output); return connect(destination); };
+          pan.connect = destination => { connect(output);
+
+ return connect(destination); };
+
           return pan;
         };
+
         window.choirCapture = { context, recorder: new MediaRecorder(output.stream), chunks: [] };
         window.choirCapture.recorder.ondataavailable = event => window.choirCapture.chunks.push(event.data);
+
         return context;
       },
     });
@@ -31,6 +37,7 @@ try {
   await page.getByRole("button", { name: /Two wishes/ }).click();
   await page.evaluate(() => { document.activeElement.blur(); window.choirCapture.recorder.start(); });
   const keys = { right: "ArrowRight", left: "ArrowLeft", up: "ArrowUp", down: "ArrowDown", wait: "Space" };
+
   for (const [index, route] of LEVELS[1].solutions.entries()) {
     for (const direction of route) {
       const before = Number(await page.getByTestId("state").getAttribute("data-beat"));
@@ -38,10 +45,13 @@ try {
       await expect(page.getByTestId("state")).toHaveAttribute("data-beat", String(before + 1));
       await page.waitForTimeout(420);
     }
+
     if (index < LEVELS[1].solutions.length - 1) { await page.keyboard.press("r"); await page.waitForTimeout(850); }
   }
+
   await expect(page.getByTestId("state")).toHaveAttribute("data-won", "true");
   await page.waitForTimeout(1000);
+
   const recording = await page.evaluate(async () => {
     const capture = window.choirCapture;
     await new Promise(resolve => { capture.recorder.onstop = resolve; capture.recorder.stop(); });
@@ -55,15 +65,20 @@ try {
     view.setUint32(24, audio.sampleRate, true); view.setUint32(28, audio.sampleRate * audio.numberOfChannels * 2, true);
     view.setUint16(32, audio.numberOfChannels * 2, true); view.setUint16(34, 16, true); label(36, "data"); view.setUint32(40, bytes.length - 44, true);
     let peak = 0, offset = 44, binary = "";
+
     for (let frame = 0; frame < audio.length; frame++) for (const channel of channels) {
       const value = Math.max(-1, Math.min(1, channel[frame])); peak = Math.max(peak, Math.abs(value));
       view.setInt16(offset, Math.round(value * 32767), true); offset += 2;
     }
+
     for (let offset = 0; offset < bytes.length; offset += 8192) binary += String.fromCharCode(...bytes.subarray(offset, offset + 8192));
+
     return { base64: btoa(binary), duration: audio.duration, sampleRate: audio.sampleRate, peak };
   });
+
   if (recording.peak < .001 || recording.duration < 5) throw new Error("Audio recording is silent or incomplete");
   await mkdir("evidence", { recursive: true });
   await writeFile("evidence/echo-choir.wav", Buffer.from(recording.base64, "base64"));
   console.log(JSON.stringify({ path: "evidence/echo-choir.wav", duration: recording.duration, sampleRate: recording.sampleRate, peak: recording.peak }));
 } finally { await browser.close(); }
+

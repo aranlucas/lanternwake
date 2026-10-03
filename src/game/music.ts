@@ -8,6 +8,7 @@ export type GardenNote = {
 
 // C-major pentatonic keeps routes consonant without choosing a melody for them.
 const SCALE = [0, 2, 4, 7, 9];
+
 const VOICES = [
   { root: 60, waveform: "triangle", gain: .016, duration: .24, pan: 0 },
   { root: 72, waveform: "sine", gain: .012, duration: .38, pan: -.45 },
@@ -18,6 +19,7 @@ const VOICES = [
 function noteAt(point: Point, voice: number): GardenNote {
   const instrument = VOICES[voice];
   const midi = instrument.root + SCALE[(point.x + point.y * 2) % SCALE.length];
+
   return { voice, midi, frequency: 440 * 2 ** ((midi - 69) / 12), ...instrument };
 }
 
@@ -26,10 +28,14 @@ export function notesForStep(before: GameState, after: GameState): GardenNote[] 
   if (before.levelId !== after.levelId || before.paused || before.won ||
       after.beat !== before.beat + 1 || after.path.length !== before.path.length + 1) return [];
   const notes: GardenNote[] = [];
+
   if (!samePoint(currentPosition(before), currentPosition(after))) notes.push(noteAt(currentPosition(after), 0));
   before.echoes.slice(0, 3).forEach((echo, index) => {
     const from = echoPosition(echo.path, before.beat), to = echoPosition(echo.path, after.beat);
+
     if (!samePoint(from, to)) notes.push(noteAt(to, index + 1));
   });
+
   return notes;
 }
+

@@ -11,9 +11,14 @@ export class GardenAudio {
   enabled = false;
   async enable(value: boolean): Promise<void> {
     this.enabled = value;
-    if (!value) { await this.suspend(); return; }
+
+    if (!value) { await this.suspend();
+
+ return; }
+
     try {
       this.context ??= new AudioContext();
+
       if (this.context.state === "suspended") await this.context.resume();
       this.play("rewind");
     } catch (error) { this.enabled = false; throw error; }
@@ -27,6 +32,7 @@ export class GardenAudio {
   }
   private schedule(note: GardenNote, delay = 0): void {
     if (!this.enabled || !this.context || this.context.state !== "running" || document.hidden) return;
+
     // Rapid input stays bounded; cancel the oldest voice rather than accumulating nodes.
     while (this.voices.size >= 16) this.stop(this.voices.values().next().value!);
     const ctx = this.context, start = ctx.currentTime + delay;
@@ -50,8 +56,10 @@ export class GardenAudio {
   silence(): void { for (const voice of this.voices) this.stop(voice); }
   async suspend(): Promise<void> {
     this.silence();
+
     if (this.context?.state === "running") await this.context.suspend();
   }
   async resume(): Promise<void> { if (this.enabled && this.context?.state === "suspended") await this.context.resume(); }
   async dispose(): Promise<void> { await this.suspend(); await this.context?.close(); }
 }
+

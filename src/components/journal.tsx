@@ -4,9 +4,13 @@ import type { Level } from "../game/types.ts";
 import { Icon } from "./icon.tsx";
 
 type JournalProps = { level: Level; completed: string[]; hint: string; showHint: boolean; onHint: () => void; onClose: () => void; onChoose: (id: string) => void };
+
 export function Journal({ level, completed, hint, showHint, onHint, onClose, onChoose }: JournalProps) {
   const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => { dialog.current?.showModal(); return () => dialog.current?.close(); }, []);
+  useEffect(() => { dialog.current?.showModal();
+
+ return () => dialog.current?.close(); }, []);
+
   return <dialog ref={dialog} className="journal" onCancel={onClose} aria-labelledby="journal-title">
     <button className="dialog-close icon-button" aria-label="Close journal" onClick={onClose}><Icon name="close" /></button>
     <h2 id="journal-title">A few borrowed moments</h2><p className="journal-intro">Walk a path. Rewind. Your echo walks it again, then waits where you left it. Every move is one beat for everyone.</p>
@@ -16,3 +20,4 @@ export function Journal({ level, completed, hint, showHint, onHint, onClose, onC
     <button className="resume-button" onClick={onClose}>Back to the garden</button>
   </dialog>;
 }
+

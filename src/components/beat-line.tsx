@@ -2,8 +2,10 @@ import { activePads } from "../game/simulation.ts";
 import type { GameState, Level } from "../game/types.ts";
 
 type BeatProps = { level: Level; state: GameState };
+
 export function BeatLine({ level, state }: BeatProps) {
   const pads = activePads(level, state);
+
   return <div className="beat-line">
     <div className="beats" aria-hidden="true">
       {Array.from({ length: level.maxBeats }, (_, i) => <span key={i} className={i < state.beat ? "beat lit" : "beat"} />)}
@@ -14,3 +16,4 @@ export function BeatLine({ level, state }: BeatProps) {
     </div>
   </div>;
 }
+
