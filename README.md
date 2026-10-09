@@ -24,7 +24,7 @@ pnpm build
 pnpm start
 ```
 
-Open **http://127.0.0.1:4317**. Development: `pnpm dev` on the same address.
+Open **http://127.0.0.1:4317**. Development: `pnpm dev` at **https://lanternwake.localhost**, served through [Portless](https://github.com/vercel-labs/portless) (a dev dependency); its first run may ask for `sudo` to bind port 443 and trust a local certificate.
 Offline caching is enabled in the production build. Wait for **Ready for offline
 play** before disconnecting; reopen the same browser and origin. The local
 server must stay running for a fresh uncached browser, but a previously cached
