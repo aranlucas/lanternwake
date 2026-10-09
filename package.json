@@ -9,7 +9,6 @@
   "packageManager": "pnpm@12.8.1",
   "scripts": {
     "dev": "portless run --name lanternwake vite",
-    "dev:direct": "vite --host 127.0.0.1 --port 4317",
     "build": "tsc -b && vite build && node scripts/build-cache.mjs",
     "check": "pnpm lint && tsc -b && node --test tests/*.test.ts",
     "test": "node --test tests/*.test.ts",
