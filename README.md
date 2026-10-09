@@ -24,7 +24,7 @@ pnpm build
 pnpm start
 ```
 
-Open **http://127.0.0.1:4317**. Development: `pnpm dev` at **https://lanternwake.localhost** after the Portless setup below.
+Open **http://127.0.0.1:4317**. Development: `pnpm dev` at **https://lanternwake.localhost**, served through [Portless](https://github.com/vercel-labs/portless) (a dev dependency); its first run may ask for `sudo` to bind port 443 and trust a local certificate.
 Offline caching is enabled in the production build. Wait for **Ready for offline
 play** before disconnecting; reopen the same browser and origin. The local
 server must stay running for a fresh uncached browser, but a previously cached
@@ -47,35 +47,6 @@ is safe when it dims. Reaching the bell requires every pad held simultaneously.
 Use **Take back your last echo** to resume its recorded path, or **Restart** for
 a fresh room. Opening the journal or moving the tab into the background pauses
 the game. Foreground return needs a deliberate resume.
-
-### Development URL with Portless
-
-The normal `pnpm run dev` command uses
-[Portless](https://github.com/vercel-labs/portless/tree/v0.15.7) for a stable local URL.
-Install its CLI once with **Node.js 24 or newer** (within this project's supported
-range), then run:
-
-```sh
-npm install -g portless@0.15.7
-pnpm run dev
-```
-
-Open **https://lanternwake.localhost** with the default proxy settings.
-Portless starts its shared proxy automatically. Its first HTTPS run creates and
-trusts a local certificate authority and may prompt for administrator privileges
-to bind port 443 or update local hostname entries. Start it from an interactive
-terminal and review those prompts. `portless doctor` diagnoses local setup issues.
-
-Portless supplies Vite with a free port, a loopback host, and `--strictPort`.
-The development command omits the usual fixed port; the injected CLI port takes
-precedence over any port in `vite.config.ts`.
-
-Linked Git worktrees receive a branch-name prefix, such as
-`https://fix-ui.lanternwake.localhost`; use the URL Portless prints.
-
-Browser storage and offline caches belong to each origin. Existing data at a
-numbered localhost URL stays there; use the app's export/import flow when available
-to move data to the named URL.
 
 ## Verification
 
