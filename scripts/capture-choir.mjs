@@ -41,9 +41,7 @@ try {
     });
   });
   await page.goto("http://127.0.0.1:4317");
-  await page
-    .locator('.world-ready[data-ready="true"]')
-    .waitFor({ state: "attached" });
+  await page.locator('.world-ready[data-ready="true"]').waitFor({ state: "attached" });
   await page.getByRole("button", { name: "Enable sound" }).click();
   await page.waitForTimeout(850);
   await page.getByRole("button", { name: "Open journal", exact: true }).click();
@@ -63,15 +61,10 @@ try {
 
   for (const [index, route] of LEVELS[1].solutions.entries()) {
     for (const direction of route) {
-      const before = Number(
-        await page.getByTestId("state").getAttribute("data-beat"),
-      );
+      const before = Number(await page.getByTestId("state").getAttribute("data-beat"));
 
       await page.keyboard.press(keys[direction]);
-      await expect(page.getByTestId("state")).toHaveAttribute(
-        "data-beat",
-        String(before + 1),
-      );
+      await expect(page.getByTestId("state")).toHaveAttribute("data-beat", String(before + 1));
       await page.waitForTimeout(420);
     }
 
@@ -93,20 +86,15 @@ try {
     const encoded = await new Blob(capture.chunks).arrayBuffer();
     const audio = await capture.context.decodeAudioData(encoded);
 
-    const channels = Array.from(
-      { length: audio.numberOfChannels },
-      (_, index) => audio.getChannelData(index),
+    const channels = Array.from({ length: audio.numberOfChannels }, (_, index) =>
+      audio.getChannelData(index),
     );
 
-    const bytes = new Uint8Array(
-        44 + audio.length * audio.numberOfChannels * 2,
-      ),
+    const bytes = new Uint8Array(44 + audio.length * audio.numberOfChannels * 2),
       view = new DataView(bytes.buffer);
 
     const label = (offset, text) =>
-      [...text].forEach((char, index) =>
-        view.setUint8(offset + index, char.charCodeAt(0)),
-      );
+      [...text].forEach((char, index) => view.setUint8(offset + index, char.charCodeAt(0)));
 
     label(0, "RIFF");
     view.setUint32(4, bytes.length - 8, true);
@@ -148,10 +136,7 @@ try {
   if (recording.peak < 0.001 || recording.duration < 5)
     throw new Error("Audio recording is silent or incomplete");
   await mkdir("evidence", { recursive: true });
-  await writeFile(
-    "evidence/echo-choir.wav",
-    Buffer.from(recording.base64, "base64"),
-  );
+  await writeFile("evidence/echo-choir.wav", Buffer.from(recording.base64, "base64"));
   console.log(
     JSON.stringify({
       path: "evidence/echo-choir.wav",

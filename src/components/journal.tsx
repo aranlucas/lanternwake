@@ -30,23 +30,14 @@ export function Journal({
   }, []);
 
   return (
-    <dialog
-      ref={dialog}
-      className="journal"
-      onCancel={onClose}
-      aria-labelledby="journal-title"
-    >
-      <button
-        className="dialog-close icon-button"
-        aria-label="Close journal"
-        onClick={onClose}
-      >
+    <dialog ref={dialog} className="journal" onCancel={onClose} aria-labelledby="journal-title">
+      <button className="dialog-close icon-button" aria-label="Close journal" onClick={onClose}>
         <Icon name="close" />
       </button>
       <h2 id="journal-title">A few borrowed moments</h2>
       <p className="journal-intro">
-        Walk a path. Rewind. Your echo walks it again, then waits where you left
-        it. Every move is one beat for everyone.
+        Walk a path. Rewind. Your echo walks it again, then waits where you left it. Every move is
+        one beat for everyone.
       </p>
       <ol className="chapter-list">
         {LEVELS.map((room, i) => (
@@ -73,9 +64,8 @@ export function Journal({
       </ol>
       <div className="journal-help">
         <p>
-          There is no rush. The garden waits when you do. Undo a step with Z.
-          Rewind with R. Use Space to wait. Taking back an echo lets you edit
-          that path.
+          There is no rush. The garden waits when you do. Undo a step with Z. Rewind with R. Use
+          Space to wait. Taking back an echo lets you edit that path.
         </p>
         <button onClick={onHint}>A gentle nudge</button>
         {showHint && (
@@ -85,9 +75,8 @@ export function Journal({
         )}
       </div>
       <p className="private-note">
-        With sound on, your footsteps become a tune. Each echo carries it in a
-        different voice. Wait to listen; resting echoes stay quiet. Progress
-        stays on this device.
+        With sound on, your footsteps become a tune. Each echo carries it in a different voice. Wait
+        to listen; resting echoes stay quiet. Progress stays on this device.
       </p>
       <button className="resume-button" onClick={onClose}>
         Back to the garden

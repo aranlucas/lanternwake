@@ -45,8 +45,7 @@ test("an echo repeats the recorded tune one octave above its keeper, independent
 test("waits leave moving echoes audible; held endpoints and stationary keeper stay silent", () => {
   let state = record().state;
 
-  for (let i = 0; i < level.solutions[0].length; i++)
-    state = step(state, "wait");
+  for (let i = 0; i < level.solutions[0].length; i++) state = step(state, "wait");
   const wait = step(state, "wait");
   assert.deepEqual(notesForStep(state, wait), []);
   const move = step(wait, "right");

@@ -16,9 +16,7 @@ export function Controls({ level, state, onAction }: ControlsProps) {
         <button
           className="rewind"
           onClick={() => onAction({ type: "rewind" })}
-          disabled={
-            locked || state.beat === 0 || state.echoes.length >= level.maxEchoes
-          }
+          disabled={locked || state.beat === 0 || state.echoes.length >= level.maxEchoes}
         >
           <Icon name="rewind" />
           Rewind & leave an echo
@@ -30,10 +28,7 @@ export function Controls({ level, state, onAction }: ControlsProps) {
           <Icon name="wait" />
           Wait
         </button>
-        <button
-          onClick={() => onAction({ type: "undo" })}
-          disabled={locked || state.beat === 0}
-        >
+        <button onClick={() => onAction({ type: "undo" })} disabled={locked || state.beat === 0}>
           <Icon name="undo" />
           Undo step
         </button>
@@ -56,10 +51,7 @@ export function Controls({ level, state, onAction }: ControlsProps) {
         ))}
       </div>
       {state.echoes.length > 0 && !locked && (
-        <button
-          className="undo-echo"
-          onClick={() => onAction({ type: "undo-echo" })}
-        >
+        <button className="undo-echo" onClick={() => onAction({ type: "undo-echo" })}>
           Take back your last echo
         </button>
       )}

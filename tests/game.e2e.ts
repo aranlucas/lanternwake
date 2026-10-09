@@ -26,23 +26,15 @@ declare global {
 
 async function open(page: Page) {
   await page.goto("/");
-  await expect(page.locator(".world-ready")).toHaveAttribute(
-    "data-ready",
-    "true",
-  );
+  await expect(page.locator(".world-ready")).toHaveAttribute("data-ready", "true");
 }
 
 async function steps(page: Page, path: Direction[]) {
   for (const direction of path) {
-    const previous = Number(
-      await page.getByTestId("state").getAttribute("data-beat"),
-    );
+    const previous = Number(await page.getByTestId("state").getAttribute("data-beat"));
 
     await page.keyboard.press(keys[direction]);
-    await expect(page.getByTestId("state")).toHaveAttribute(
-      "data-beat",
-      String(previous + 1),
-    );
+    await expect(page.getByTestId("state")).toHaveAttribute("data-beat", String(previous + 1));
   }
 }
 
@@ -58,10 +50,7 @@ test("first echo reveals the mechanic and all four rooms finish through keyboard
   page.on("request", (request) => {
     const url = new URL(request.url());
 
-    if (
-      ["http:", "https:"].includes(url.protocol) &&
-      url.origin !== "http://127.0.0.1:4317"
-    )
+    if (["http:", "https:"].includes(url.protocol) && url.origin !== "http://127.0.0.1:4317")
       outgoing.push(request.url());
   });
   await open(page);
@@ -70,20 +59,14 @@ test("first echo reveals the mechanic and all four rooms finish through keyboard
   await page.screenshot({ path: "evidence/desktop.png", fullPage: true });
 
   for (const [chapter, level] of LEVELS.entries()) {
-    await expect(page.getByTestId("state")).toHaveAttribute(
-      "data-level",
-      level.id,
-    );
+    await expect(page.getByTestId("state")).toHaveAttribute("data-level", level.id);
 
     for (const [index, path] of level.solutions.entries()) {
       await steps(page, path);
 
       if (index < level.solutions.length - 1) {
         await page.keyboard.press("r");
-        await expect(page.getByTestId("state")).toHaveAttribute(
-          "data-echoes",
-          String(index + 1),
-        );
+        await expect(page.getByTestId("state")).toHaveAttribute("data-echoes", String(index + 1));
 
         if (chapter === 0) {
           await page.keyboard.press("ArrowRight");
@@ -103,8 +86,7 @@ test("first echo reveals the mechanic and all four rooms finish through keyboard
 
     await expect(page.getByTestId("state")).toHaveAttribute("data-won", "true");
 
-    if (chapter === 3)
-      await page.screenshot({ path: "evidence/morning.png", fullPage: true });
+    if (chapter === 3) await page.screenshot({ path: "evidence/morning.png", fullPage: true });
     await page
       .getByRole("button", {
         name: chapter === 3 ? "Wander again" : "The next little moment",
@@ -112,14 +94,9 @@ test("first echo reveals the mechanic and all four rooms finish through keyboard
       .click();
   }
 
-  await expect(page.getByTestId("state")).toHaveAttribute(
-    "data-level",
-    "company",
-  );
+  await expect(page.getByTestId("state")).toHaveAttribute("data-level", "company");
   await page.getByRole("button", { name: "Open journal", exact: true }).click();
-  await expect(
-    page.locator(".chapter-complete").filter({ hasText: "Completed" }),
-  ).toHaveCount(4);
+  await expect(page.locator(".chapter-complete").filter({ hasText: "Completed" })).toHaveCount(4);
   expect(errors).toEqual([]);
   expect(outgoing).toEqual([]);
 });
@@ -152,10 +129,7 @@ test("undo, echo recovery, pause, restart and foreground return preserve control
     });
     document.dispatchEvent(new Event("visibilitychange"));
   });
-  await expect(page.getByTestId("state")).toHaveAttribute(
-    "data-paused",
-    "true",
-  );
+  await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "true");
   await page.evaluate(() => {
     Object.defineProperty(document, "hidden", {
       configurable: true,
@@ -181,19 +155,14 @@ test("service worker caches the real artwork and game; offline reload restores a
   await page.evaluate(async () => {
     if (!navigator.serviceWorker.controller)
       await new Promise<void>((resolve) =>
-        navigator.serviceWorker.addEventListener(
-          "controllerchange",
-          () => resolve(),
-          { once: true },
-        ),
+        navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), {
+          once: true,
+        }),
       );
   });
   await context.setOffline(true);
   await page.reload();
-  await expect(page.locator(".world-ready")).toHaveAttribute(
-    "data-ready",
-    "true",
-  );
+  await expect(page.locator(".world-ready")).toHaveAttribute("data-ready", "true");
   await expect(page.getByTestId("state")).toHaveAttribute("data-echoes", "1");
   await expect(page.getByTestId("state")).toHaveAttribute("data-beat", "1");
   await steps(page, ["right", "right", "right", "right", "right"]);
@@ -210,9 +179,7 @@ test("mobile touch controls finish a room and reduced-motion layout does not ove
   const right = page.getByRole("button", { name: "Move right", exact: true });
   await right.click();
   await right.click();
-  await page
-    .getByRole("button", { name: "Rewind & leave an echo", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Rewind & leave an echo", exact: true }).click();
   await right.click();
   await right.click();
   await page.waitForTimeout(100);
@@ -220,20 +187,13 @@ test("mobile touch controls finish a room and reduced-motion layout does not ove
 
   for (let i = 0; i < 4; i++) await right.click();
   await expect(page.getByTestId("state")).toHaveAttribute("data-won", "true");
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole("button", { name: "The next little moment" }).click();
   await page.getByRole("button", { name: "Open journal", exact: true }).click();
   await page.getByRole("button", { name: "A gentle nudge" }).click();
   await expect(page.locator(".hint")).toBeVisible();
   await page.getByRole("button", { name: "Back to the garden" }).click();
-  await expect(page.getByTestId("state")).toHaveAttribute(
-    "data-paused",
-    "false",
-  );
+  await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
 });
 
 test("native game dialogs contain focus and Escape resumes only the pause screen", async ({
@@ -245,49 +205,25 @@ test("native game dialogs contain focus and Escape resumes only the pause screen
   const resume = page.getByRole("button", { name: "Keep wandering" });
   await expect(resume).toBeFocused();
   await page.keyboard.press("Tab");
-  expect(
-    await page.evaluate(
-      () => !!document.activeElement?.closest("dialog[open]"),
-    ),
-  ).toBe(true);
+  expect(await page.evaluate(() => !!document.activeElement?.closest("dialog[open]"))).toBe(true);
   await page.keyboard.press("Shift+Tab");
-  expect(
-    await page.evaluate(
-      () => !!document.activeElement?.closest("dialog[open]"),
-    ),
-  ).toBe(true);
+  expect(await page.evaluate(() => !!document.activeElement?.closest("dialog[open]"))).toBe(true);
   await page.keyboard.press("r");
   await expect(page.getByTestId("state")).toHaveAttribute("data-echoes", "0");
   await page.keyboard.press("Escape");
-  await expect(page.getByTestId("state")).toHaveAttribute(
-    "data-paused",
-    "false",
-  );
+  await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
   await page.getByRole("button", { name: "Restart", exact: true }).click();
   await steps(page, LEVELS[0].solutions[0]);
   await page.keyboard.press("r");
   await steps(page, LEVELS[0].solutions[1]);
-  await expect(
-    page.getByRole("button", { name: "The next little moment" }),
-  ).toBeFocused();
+  await expect(page.getByRole("button", { name: "The next little moment" })).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(
-    page.getByRole("button", { name: "Open the journal", exact: true }),
-  ).toBeFocused();
+  await expect(page.getByRole("button", { name: "Open the journal", exact: true })).toBeFocused();
   await page.keyboard.press("Tab");
-  expect(
-    await page.evaluate(
-      () => !!document.activeElement?.closest("dialog[open]"),
-    ),
-  ).toBe(true);
+  expect(await page.evaluate(() => !!document.activeElement?.closest("dialog[open]"))).toBe(true);
   await page.keyboard.press("Escape");
-  await expect(
-    page.getByRole("dialog", { name: "A little more morning." }),
-  ).toBeVisible();
-  await expect(page.getByTestId("state")).toHaveAttribute(
-    "data-paused",
-    "false",
-  );
+  await expect(page.getByRole("dialog", { name: "A little more morning." })).toBeVisible();
+  await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
   await page.evaluate(() => {
     Object.defineProperty(document, "hidden", {
       configurable: true,
@@ -303,14 +239,8 @@ test("native game dialogs contain focus and Escape resumes only the pause screen
     });
   });
   await page.getByRole("button", { name: "The next little moment" }).click();
-  await expect(page.getByTestId("state")).toHaveAttribute(
-    "data-level",
-    "wishes",
-  );
-  await expect(page.getByTestId("state")).toHaveAttribute(
-    "data-paused",
-    "false",
-  );
+  await expect(page.getByTestId("state")).toHaveAttribute("data-level", "wishes");
+  await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
 });
 
 test("real Web Audio plays recorded echo voices only after opt-in and stops on pause or mute", async ({
@@ -367,9 +297,7 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
   await steps(page, ["right"]);
   expect(await page.evaluate(() => window.audioTrace.contexts.length)).toBe(0);
   await page.getByRole("button", { name: "Enable sound" }).click();
-  await expect
-    .poll(() => page.evaluate(() => window.audioTrace.starts.length))
-    .toBe(3);
+  await expect.poll(() => page.evaluate(() => window.audioTrace.starts.length)).toBe(3);
   await page.evaluate(() => {
     window.audioTrace.starts = [];
   });
@@ -381,8 +309,7 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
   await page.evaluate(() => {
     window.audioTrace.starts = [];
 
-    if (document.activeElement instanceof HTMLElement)
-      document.activeElement.blur();
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
   });
   await steps(page, ["wait", "wait"]);
   const echoes = await page.evaluate(() => window.audioTrace.starts);
@@ -397,9 +324,7 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
     .toBe("suspended");
   expect(await page.evaluate(() => window.audioTrace.active.size)).toBe(0);
   await page.getByRole("button", { name: "Keep wandering" }).click();
-  await expect
-    .poll(() => page.evaluate(() => window.audioTrace.contexts[0].state))
-    .toBe("running");
+  await expect.poll(() => page.evaluate(() => window.audioTrace.contexts[0].state)).toBe("running");
   // Many immediate actions exercise the voice cap before their envelopes can finish.
   await page.evaluate(() => {
     for (let i = 0; i < 70; i++)
@@ -418,27 +343,21 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
   expect(await page.evaluate(() => window.audioTrace.active.size)).toBe(0);
   const mutedCount = await page.evaluate(() => window.audioTrace.starts.length);
   await page.keyboard.press("ArrowLeft");
-  expect(await page.evaluate(() => window.audioTrace.starts.length)).toBe(
-    mutedCount,
-  );
+  expect(await page.evaluate(() => window.audioTrace.starts.length)).toBe(mutedCount);
   await page.getByRole("button", { name: "Enable sound" }).click();
   await page.getByRole("button", { name: "Open journal", exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.audioTrace.contexts[0].state))
     .toBe("suspended");
   await page.getByRole("button", { name: /Two wishes/ }).click();
-  await expect
-    .poll(() => page.evaluate(() => window.audioTrace.contexts[0].state))
-    .toBe("running");
+  await expect.poll(() => page.evaluate(() => window.audioTrace.contexts[0].state)).toBe("running");
   await page.evaluate(() => {
     window.audioTrace.starts = [];
   });
   await steps(page, ["right"]);
   expect(await page.evaluate(() => window.audioTrace.starts.length)).toBe(1);
   await page.reload();
-  await expect(
-    page.getByRole("button", { name: "Enable sound" }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Enable sound" })).toBeVisible();
   expect(await page.evaluate(() => window.audioTrace.contexts.length)).toBe(0);
   expect(errors).toEqual([]);
 });

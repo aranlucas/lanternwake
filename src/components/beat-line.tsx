@@ -28,11 +28,7 @@ export function BeatLine({ level, state }: BeatProps) {
           aria-label={`${pads.length} of ${level.pads.length} lights held`}
         >
           {level.pads.map((pad) => (
-            <span
-              className={pads.includes(pad.id) ? "held" : ""}
-              key={pad.id}
-              title={pad.name}
-            >
+            <span className={pads.includes(pad.id) ? "held" : ""} key={pad.id} title={pad.name}>
               {pad.id === "a" ? "☾" : pad.id === "b" ? "✧" : "☼"}
             </span>
           ))}

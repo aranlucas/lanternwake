@@ -1,14 +1,7 @@
 import { z } from "zod";
 import { LEVELS, levelById } from "./levels.ts";
 import { initialState, samePoint, transition } from "./simulation.ts";
-import type {
-  Direction,
-  Echo,
-  GameState,
-  Level,
-  Point,
-  SaveData,
-} from "./types.ts";
+import type { Direction, Echo, GameState, Level, Point, SaveData } from "./types.ts";
 
 export const SAVE_KEY = "lanternwake:v1";
 
@@ -40,14 +33,9 @@ function parsePath(value: Point[], level: Level): Point[] | null {
   const path: Point[] = [];
 
   for (const point of value) {
-    if (!level.map[point.y]?.[point.x] || level.map[point.y][point.x] === "_")
-      return null;
+    if (!level.map[point.y]?.[point.x] || level.map[point.y][point.x] === "_") return null;
 
-    if (
-      path.length &&
-      Math.abs(path.at(-1)!.x - point.x) + Math.abs(path.at(-1)!.y - point.y) >
-        1
-    )
+    if (path.length && Math.abs(path.at(-1)!.x - point.x) + Math.abs(path.at(-1)!.y - point.y) > 1)
       return null;
     path.push(point);
   }
@@ -67,11 +55,7 @@ function directionBetween(from: Point, to: Point): Direction {
           : "wait";
 }
 
-function replayPath(
-  level: Level,
-  path: Point[],
-  echoes: Echo[],
-): GameState | null {
+function replayPath(level: Level, path: Point[], echoes: Echo[]): GameState | null {
   let state = { ...initialState(level), echoes };
 
   for (let i = 1; i < path.length; i++) {
@@ -120,8 +104,7 @@ export function parseSave(raw: string | null): SaveData | null {
     if (!path) return null;
     const state = replayPath(level, path, echoes);
 
-    if (!state || saved.beat !== state.beat || saved.won !== state.won)
-      return null;
+    if (!state || saved.beat !== state.beat || saved.won !== state.won) return null;
 
     const completed = data.completed.flatMap((id) => {
       const parsed = z.string().safeParse(id);

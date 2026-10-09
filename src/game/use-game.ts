@@ -16,9 +16,7 @@ function loadInitial() {
 export function useGame() {
   const [saved] = useState(loadInitial);
 
-  const [state, setState] = useState<GameState>(
-    saved?.state ?? initialState(LEVELS[0]),
-  );
+  const [state, setState] = useState<GameState>(saved?.state ?? initialState(LEVELS[0]));
 
   const [completed, setCompleted] = useState<string[]>(saved?.completed ?? []);
   const [sound, setSound] = useState(false); // Even a saved sound preference needs a fresh user gesture.
@@ -78,17 +76,12 @@ export function useGame() {
   useEffect(() => {
     if (state.won)
       setCompleted((previous) =>
-        previous.includes(state.levelId)
-          ? previous
-          : [...previous, state.levelId],
+        previous.includes(state.levelId) ? previous : [...previous, state.levelId],
       );
   }, [state.won, state.levelId]);
   useEffect(() => {
     try {
-      localStorage.setItem(
-        SAVE_KEY,
-        JSON.stringify({ version: 1, state, completed, sound }),
-      );
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ version: 1, state, completed, sound }));
     } catch {
       setStorageAvailable(false);
     }

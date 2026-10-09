@@ -11,10 +11,7 @@ import { useGame } from "./game/use-game.ts";
 import type { Direction, GameState, Level } from "./game/types.ts";
 
 function guidance(level: Level, state: GameState): string {
-  if (
-    state.message &&
-    state.message !== "Every step is a moment you can borrow."
-  )
+  if (state.message && state.message !== "Every step is a moment you can borrow.")
     return state.message;
 
   if (state.echoes.length === 0 && activePads(level, state).length)
@@ -56,10 +53,7 @@ export default function App() {
   const chapter = LEVELS.findIndex((room) => room.id === level.id),
     final = chapter === LEVELS.length - 1;
 
-  const move = useCallback(
-    (direction: Direction) => act({ type: "step", direction }),
-    [act],
-  );
+  const move = useCallback((direction: Direction) => act({ type: "step", direction }), [act]);
 
   const closeJournal = () => {
     setJournal(false);
@@ -82,8 +76,7 @@ export default function App() {
 
       if (!(target instanceof HTMLElement)) return;
 
-      if (target.matches("input, textarea, select, [contenteditable=true]"))
-        return;
+      if (target.matches("input, textarea, select, [contenteditable=true]")) return;
 
       const directions = new Map<string, Direction>([
         ["ArrowUp", "up"],
@@ -96,8 +89,7 @@ export default function App() {
         ["d", "right"],
       ]);
 
-      const direction =
-        directions.get(event.key) ?? directions.get(event.key.toLowerCase());
+      const direction = directions.get(event.key) ?? directions.get(event.key.toLowerCase());
 
       if (direction) {
         event.preventDefault();
@@ -192,9 +184,8 @@ export default function App() {
         </div>
         {level.id === "beat" && (
           <p className="bridge-rhythm">
-            Moon bridge:{" "}
-            <span>{bridgeOpen(state.beat) ? "awake" : "asleep"}</span> · two
-            beats bright, two beats quiet
+            Moon bridge: <span>{bridgeOpen(state.beat) ? "awake" : "asleep"}</span> · two beats
+            bright, two beats quiet
           </p>
         )}
         <BeatLine level={level} state={state} />
@@ -209,9 +200,7 @@ export default function App() {
                 ? "Ready for offline play"
                 : "A little company, whenever you need it."}
           </span>
-          <span className="key-help">
-            Move: arrows or WASD · Rewind: R · Wait: Space
-          </span>
+          <span className="key-help">Move: arrows or WASD · Rewind: R · Wait: Space</span>
         </div>
         {!storageAvailable && (
           <p className="save-warning">
@@ -235,9 +224,7 @@ export default function App() {
         <GameDialog labelId="win-title">
           <div className="win-card">
             <span className="win-symbol">☼</span>
-            <h2 id="win-title">
-              {final ? "You brought the morning." : "A little more morning."}
-            </h2>
+            <h2 id="win-title">{final ? "You brought the morning." : "A little more morning."}</h2>
             <p>{level.story}</p>
             <button
               className="resume-button"
@@ -266,9 +253,7 @@ export default function App() {
         <Journal
           level={level}
           completed={completed}
-          hint={
-            level.hints[Math.min(state.echoes.length, level.hints.length - 1)]
-          }
+          hint={level.hints[Math.min(state.echoes.length, level.hints.length - 1)]}
           showHint={showHint}
           onHint={() => setShowHint(true)}
           onClose={closeJournal}

@@ -10,12 +10,7 @@ import {
   transition,
 } from "../src/game/simulation.ts";
 import { parseSave } from "../src/game/storage.ts";
-import type {
-  Direction,
-  GameAction,
-  GameState,
-  Level,
-} from "../src/game/types.ts";
+import type { Direction, GameAction, GameState, Level } from "../src/game/types.ts";
 
 function play(level: Level, paths: Direction[][]): GameState {
   let state = initialState(level);
@@ -30,8 +25,7 @@ function play(level: Level, paths: Direction[][]): GameState {
       );
     }
 
-    if (index < paths.length - 1)
-      state = transition(level, state, { type: "rewind" });
+    if (index < paths.length - 1) state = transition(level, state, { type: "rewind" });
   });
 
   return state;
@@ -54,10 +48,7 @@ for (const level of LEVELS)
       }),
     );
 
-    assert.ok(
-      saved,
-      "Winning state must round-trip through validated local persistence",
-    );
+    assert.ok(saved, "Winning state must round-trip through validated local persistence");
     assert.equal(saved.state.won, true);
   });
 
@@ -118,10 +109,7 @@ test("pause freezes movement/rewinds; restart clears echoes; undo restores synch
   const level = LEVELS[0];
   let state = play(level, [level.solutions[0]]);
   const paused = transition(level, state, { type: "pause", value: true });
-  assert.equal(
-    transition(level, paused, { type: "step", direction: "left" }),
-    paused,
-  );
+  assert.equal(transition(level, paused, { type: "step", direction: "left" }), paused);
   assert.equal(transition(level, paused, { type: "rewind" }), paused);
   state = transition(level, paused, { type: "pause", value: false });
   const rewound = transition(level, state, { type: "rewind" });
@@ -132,10 +120,7 @@ test("pause freezes movement/rewinds; restart clears echoes; undo restores synch
   const takenBack = transition(level, moved, { type: "undo-echo" });
   assert.deepEqual(takenBack.path, state.path);
   assert.equal(takenBack.echoes.length, 0);
-  assert.deepEqual(
-    transition(level, paused, { type: "restart" }),
-    initialState(level),
-  );
+  assert.deepEqual(transition(level, paused, { type: "restart" }), initialState(level));
 });
 
 test("empty echoes and the fourth echo are refused; full beat budget remains undoable", () => {
@@ -151,10 +136,7 @@ test("empty echoes and the fourth echo are refused; full beat budget remains und
   for (let i = 0; i < 16; i++)
     state = transition(level, state, { type: "step", direction: "wait" });
   assert.equal(transition(level, state, { type: "rewind" }).echoes.length, 3);
-  assert.equal(
-    transition(level, state, { type: "step", direction: "wait" }).beat,
-    16,
-  );
+  assert.equal(transition(level, state, { type: "step", direction: "wait" }).beat, 16);
   assert.equal(transition(level, state, { type: "undo" }).beat, 15);
 });
 
@@ -169,12 +151,7 @@ test("save validation rejects malformed, teleporting, stale-version, forged and 
   assert.equal(parseSave(JSON.stringify({ version: 2, state })), null);
   assert.equal(parseSave(make({ ...state, levelId: "missing" })), null);
   assert.equal(parseSave(make({ ...state, won: true })), null);
-  assert.equal(
-    parseSave(
-      make({ ...state, path: [state.path[0], { x: 7, y: 3 }], beat: 1 }),
-    ),
-    null,
-  );
+  assert.equal(parseSave(make({ ...state, path: [state.path[0], { x: 7, y: 3 }], beat: 1 })), null);
   assert.equal(
     parseSave(
       make({
@@ -195,9 +172,9 @@ test("deterministic replay holds across duplicate randomized action runs", () =>
     return seed;
   };
 
-  const choices: GameAction[] = (
-    ["up", "down", "left", "right", "wait"] as const
-  ).map((direction) => ({ type: "step", direction }));
+  const choices: GameAction[] = (["up", "down", "left", "right", "wait"] as const).map(
+    (direction) => ({ type: "step", direction }),
+  );
 
   choices.push(
     { type: "undo" },
@@ -209,10 +186,7 @@ test("deterministic replay holds across duplicate randomized action runs", () =>
   );
 
   for (const level of LEVELS) {
-    const actions = Array.from(
-      { length: 400 },
-      () => choices[random() % choices.length],
-    );
+    const actions = Array.from({ length: 400 }, () => choices[random() % choices.length]);
 
     const run = () =>
       actions.reduce((state, action) => {
@@ -220,10 +194,7 @@ test("deterministic replay holds across duplicate randomized action runs", () =>
         assert.equal(result.beat, result.path.length - 1);
         assert.ok(result.beat <= level.maxBeats);
         assert.ok(result.echoes.length <= level.maxEchoes);
-        assert.notEqual(
-          level.map[currentPosition(result).y][currentPosition(result).x],
-          "_",
-        );
+        assert.notEqual(level.map[currentPosition(result).y][currentPosition(result).x], "_");
 
         return result;
       }, initialState(level));

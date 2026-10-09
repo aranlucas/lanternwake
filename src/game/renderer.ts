@@ -1,11 +1,5 @@
 import Phaser from "phaser";
-import {
-  activePads,
-  bridgeOpen,
-  currentPosition,
-  echoPosition,
-  gateOpen,
-} from "./simulation.ts";
+import { activePads, bridgeOpen, currentPosition, echoPosition, gateOpen } from "./simulation.ts";
 import type { Direction, GameState, Level, Point } from "./types.ts";
 
 export const ASSETS = {
@@ -49,9 +43,7 @@ export class GardenScene extends Phaser.Scene {
     this.load.image("atlas", ASSETS.atlas);
   }
   create(): void {
-    this.add
-      .image(WIDTH / 2, HEIGHT / 2, "garden")
-      .setDisplaySize(WIDTH, HEIGHT);
+    this.add.image(WIDTH / 2, HEIGHT / 2, "garden").setDisplaySize(WIDTH, HEIGHT);
     // Frame extraction uses the atlas directly; source raster files are unmodified.
     const source = this.textures.get("atlas").getSourceImage();
 
@@ -74,15 +66,9 @@ export class GardenScene extends Phaser.Scene {
     this.render(this.level, this.state, true);
     this.onReady();
   }
-  private image(
-    point: Point,
-    frame: number,
-    size = 172,
-  ): Phaser.GameObjects.Image {
+  private image(point: Point, frame: number, size = 172): Phaser.GameObjects.Image {
     const p = tilePoint(point),
-      image = this.add
-        .image(p.x, p.y, "atlas", String(frame))
-        .setDisplaySize(size, size * 0.889);
+      image = this.add.image(p.x, p.y, "atlas", String(frame)).setDisplaySize(size, size * 0.889);
 
     this.world!.add(image);
 
@@ -101,42 +87,25 @@ export class GardenScene extends Phaser.Scene {
         if (tile === "_") return;
         const pad = level.pads.find((p) => p.x === x && p.y === y);
 
-        const baseFrame = pad
-          ? pad.id === "a"
-            ? 2
-            : pad.id === "b"
-              ? 8
-              : 10
-          : 1;
+        const baseFrame = pad ? (pad.id === "a" ? 2 : pad.id === "b" ? 8 : 10) : 1;
 
         const frame = pad && lit.includes(pad.id) ? baseFrame + 1 : baseFrame;
         const stone = this.image({ x, y }, frame);
 
-        if (tile === "p")
-          stone.setTint(0xadebfa).setAlpha(bridgeOpen(state.beat) ? 1 : 0.24);
+        if (tile === "p") stone.setTint(0xadebfa).setAlpha(bridgeOpen(state.beat) ? 1 : 0.24);
         stone.setInteractive({ useHandCursor: true }).on("pointerdown", () => {
           const player = currentPosition(this.state),
             dx = x - player.x,
             dy = y - player.y;
 
           if (Math.abs(dx) + Math.abs(dy) === 1)
-            this.onMove(
-              dx === 1
-                ? "right"
-                : dx === -1
-                  ? "left"
-                  : dy === 1
-                    ? "down"
-                    : "up",
-            );
+            this.onMove(dx === 1 ? "right" : dx === -1 ? "left" : dy === 1 ? "down" : "up");
         });
       }),
     );
 
     for (const gate of level.gates)
-      this.image(gate, gateOpen(level, state, gate) ? 5 : 4, 210).setDepth(
-        100 + gate.y,
-      );
+      this.image(gate, gateOpen(level, state, gate) ? 5 : 4, 210).setDepth(100 + gate.y);
     this.ring?.destroy();
     this.ring = this.image(level.goal, state.won ? 7 : 6, 216).setDepth(110);
 
@@ -153,9 +122,7 @@ export class GardenScene extends Phaser.Scene {
       const previous = this.actors[i];
 
       if (!previous)
-        this.actors[i] = this.add
-          .image(p.x, p.y - 24, "atlas", "0")
-          .setDisplaySize(166, 148);
+        this.actors[i] = this.add.image(p.x, p.y - 24, "atlas", "0").setDisplaySize(166, 148);
       const actor = this.actors[i];
       actor
         .setDepth(200 + point.y * 10 + i)
@@ -165,9 +132,7 @@ export class GardenScene extends Phaser.Scene {
       if (!player) actor.setTint(TINTS[i % 3]);
       this.tweens.killTweensOf(actor);
 
-      const stacked =
-        occupants.filter((p2) => p2.x === point.x && p2.y === point.y).length >
-        1;
+      const stacked = occupants.filter((p2) => p2.x === point.x && p2.y === point.y).length > 1;
 
       const localOccupants = occupants.flatMap((p2, index) =>
         p2.x === point.x && p2.y === point.y ? [{ point: p2, index }] : [],
@@ -176,9 +141,7 @@ export class GardenScene extends Phaser.Scene {
       const localIndex = localOccupants.findIndex((p2) => p2.index === i);
 
       const destination = {
-        x:
-          p.x +
-          (stacked ? (localIndex - (localOccupants.length - 1) / 2) * 48 : 0),
+        x: p.x + (stacked ? (localIndex - (localOccupants.length - 1) / 2) * 48 : 0),
         y: p.y - 24 - (player ? 0 : 8),
       };
 
@@ -204,10 +167,7 @@ export class GardenScene extends Phaser.Scene {
   }
 }
 
-export function createGarden(
-  parent: HTMLElement,
-  scene: GardenScene,
-): Phaser.Game {
+export function createGarden(parent: HTMLElement, scene: GardenScene): Phaser.Game {
   return new Phaser.Game({
     type: Phaser.AUTO,
     parent,

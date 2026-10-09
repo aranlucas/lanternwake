@@ -14,9 +14,7 @@ const page = await context.newPage();
 
 await page.goto("http://127.0.0.1:4317");
 
-await page
-  .locator('.world-ready[data-ready="true"]')
-  .waitFor({ state: "attached" });
+await page.locator('.world-ready[data-ready="true"]').waitFor({ state: "attached" });
 
 await page.waitForTimeout(900);
 

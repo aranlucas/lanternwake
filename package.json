@@ -3,10 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": ">=24"
-  },
-  "packageManager": "pnpm@12.10.1",
   "scripts": {
     "dev": "portless run vite",
     "build": "tsc -b && vite build && node scripts/build-cache.mjs",
@@ -29,9 +25,14 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
+    "oxfmt": "^0.72.0",
     "oxlint": "1.87.0",
     "portless": "0.15.7",
     "typescript": "7.0.2",
     "vite": "8.3.4"
-  }
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.10.1"
 }

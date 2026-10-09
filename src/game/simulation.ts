@@ -1,10 +1,4 @@
-import type {
-  Direction,
-  GameAction,
-  GameState,
-  Level,
-  Point,
-} from "./types.ts";
+import type { Direction, GameAction, GameState, Level, Point } from "./types.ts";
 
 const DELTAS: Record<Direction, Point> = {
   up: { x: 0, y: -1 },
@@ -34,10 +28,7 @@ export function activePads(
   beat = state.beat,
   player = currentPosition(state),
 ): string[] {
-  const occupants = [
-    player,
-    ...state.echoes.map((echo) => echoPosition(echo.path, beat)),
-  ];
+  const occupants = [player, ...state.echoes.map((echo) => echoPosition(echo.path, beat))];
 
   return level.pads
     .filter((pad) => occupants.some((point) => samePoint(point, pad)))
@@ -53,10 +44,7 @@ export function gateOpen(
 ): boolean {
   const gate = level.gates.find((g) => samePoint(g, point));
 
-  return (
-    !gate ||
-    gate.pads.every((id) => activePads(level, state, beat, player).includes(id))
-  );
+  return !gate || gate.pads.every((id) => activePads(level, state, beat, player).includes(id));
 }
 
 export function initialState(level: Level): GameState {
@@ -82,8 +70,7 @@ function recordEcho(level: Level, state: GameState): GameState {
   if (state.echoes.length >= level.maxEchoes)
     return {
       ...state,
-      message:
-        "Three echoes is a full constellation. Undo an echo to try another path.",
+      message: "Three echoes is a full constellation. Undo an echo to try another path.",
     };
 
   return {
@@ -99,11 +86,7 @@ function recordEcho(level: Level, state: GameState): GameState {
   };
 }
 
-export function transition(
-  level: Level,
-  state: GameState,
-  action: GameAction,
-): GameState {
+export function transition(level: Level, state: GameState, action: GameAction): GameState {
   if (action.type === "restart") return initialState(level);
 
   if (action.type === "pause") return { ...state, paused: action.value };
@@ -160,8 +143,7 @@ export function transition(
   if (!gateOpen(level, state, target, nextBeat, target))
     return {
       ...state,
-      message:
-        "The gate needs its lights held. Leave an echo on a matching pad.",
+      message: "The gate needs its lights held. Leave an echo on a matching pad.",
     };
 
   if (tile === "p" && !bridgeOpen(nextBeat) && action.direction !== "wait")
@@ -174,17 +156,12 @@ export function transition(
     ...state,
     path: [...state.path, target],
     beat: nextBeat,
-    message:
-      action.direction === "wait"
-        ? "You wait. Your echoes keep their promises."
-        : "",
+    message: action.direction === "wait" ? "You wait. Your echoes keep their promises." : "",
   };
 
   const lit = activePads(level, next);
 
-  const won =
-    samePoint(target, level.goal) &&
-    level.pads.every((pad) => lit.includes(pad.id));
+  const won = samePoint(target, level.goal) && level.pads.every((pad) => lit.includes(pad.id));
 
   return {
     ...next,

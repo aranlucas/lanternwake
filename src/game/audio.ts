@@ -59,17 +59,11 @@ export class GardenAudio {
     );
   }
   private schedule(note: GardenNote, delay = 0): void {
-    if (
-      !this.enabled ||
-      !this.context ||
-      this.context.state !== "running" ||
-      document.hidden
-    )
+    if (!this.enabled || !this.context || this.context.state !== "running" || document.hidden)
       return;
 
     // Rapid input stays bounded; cancel the oldest voice rather than accumulating nodes.
-    while (this.voices.size >= 16)
-      this.stop(this.voices.values().next().value!);
+    while (this.voices.size >= 16) this.stop(this.voices.values().next().value!);
 
     const ctx = this.context,
       start = ctx.currentTime + delay;
@@ -112,8 +106,7 @@ export class GardenAudio {
     if (this.context?.state === "running") await this.context.suspend();
   }
   async resume(): Promise<void> {
-    if (this.enabled && this.context?.state === "suspended")
-      await this.context.resume();
+    if (this.enabled && this.context?.state === "suspended") await this.context.resume();
   }
   async dispose(): Promise<void> {
     await this.suspend();

@@ -25,9 +25,7 @@ export function GameDialog({ labelId, onDismiss, children }: GameDialogProps) {
         if (event.key !== "Tab") return;
 
         const buttons = Array.from(
-          event.currentTarget.querySelectorAll<HTMLButtonElement>(
-            "button:not(:disabled)",
-          ),
+          event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"),
         );
 
         const first = buttons[0],
@@ -39,8 +37,7 @@ export function GameDialog({ labelId, onDismiss, children }: GameDialogProps) {
         // Tab from moving into browser chrome at the end of this small button group.
         if (
           event.shiftKey &&
-          (document.activeElement === first ||
-            document.activeElement === event.currentTarget)
+          (document.activeElement === first || document.activeElement === event.currentTarget)
         ) {
           event.preventDefault();
           last.focus();

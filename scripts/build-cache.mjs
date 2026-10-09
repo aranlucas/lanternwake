@@ -7,17 +7,13 @@ async function files(dir) {
   return (
     await Promise.all(
       entries.map(async (entry) =>
-        entry.isDirectory()
-          ? files(`${dir}/${entry.name}`)
-          : `${dir}/${entry.name}`,
+        entry.isDirectory() ? files(`${dir}/${entry.name}`) : `${dir}/${entry.name}`,
       ),
     )
   ).flat();
 }
 
-const paths = (await files("dist"))
-  .filter((path) => !path.endsWith("sw.js"))
-  .sort();
+const paths = (await files("dist")).filter((path) => !path.endsWith("sw.js")).sort();
 
 const hash = createHash("sha256");
 
