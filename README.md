@@ -48,6 +48,35 @@ Use **Take back your last echo** to resume its recorded path, or **Restart** for
 a fresh room. Opening the journal or moving the tab into the background pauses
 the game. Foreground return needs a deliberate resume.
 
+### Named local URL with Portless
+
+[Portless](https://github.com/vercel-labs/portless/tree/v0.15.7) gives this checkout a
+stable local URL. Complete the local setup above, use **Node.js 24 or newer**
+(within this project's supported range), then run:
+
+```sh
+npm install -g portless@0.15.7
+pnpm run dev:portless
+```
+
+Open **https://lanternwake.localhost** with the default proxy settings.
+Portless starts its shared proxy automatically. Its first HTTPS run creates and
+trusts a local certificate authority and may prompt for administrator privileges
+to bind port 443 or update local hostname entries. Start it from an interactive
+terminal and review those prompts. `portless doctor` diagnoses local setup issues.
+
+Portless supplies Vite with a free port, a loopback host, and `--strictPort`.
+This opt-in script omits the usual fixed port; the injected CLI port takes
+precedence over any port in `vite.config.ts`.
+
+Linked Git worktrees receive a branch-name prefix, such as
+`https://fix-ui.lanternwake.localhost`; use the URL Portless prints.
+Use `pnpm run dev` for the existing direct-server workflow.
+
+Browser storage and offline caches belong to each origin. Existing data at a
+numbered localhost URL stays there; use the app's export/import flow when available
+to move data to the named URL.
+
 ## Verification
 
 ```sh
