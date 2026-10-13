@@ -2,9 +2,11 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { resolve, extname } from "node:path";
 
-const root = resolve("dist"),
-  host = process.env.HOST ?? "127.0.0.1",
-  port = Number(process.env.PORT ?? 4317);
+const root = resolve("dist");
+
+  const host = process.env.HOST ?? "127.0.0.1";
+
+  const port = Number(process.env.PORT ?? 4317);
 
 const types = {
   ".html": "text/html",
@@ -53,7 +55,8 @@ const server = createServer(async (req, res) => {
   }
 
   try {
-    if (!(await stat(path)).isFile()) throw new Error("not found");
+    if (!(await stat(path)).isFile()) {throw new Error("not found");}
+
     const body = await readFile(path);
     res.writeHead(200, {
       "content-type": types[extname(path)] ?? "application/octet-stream",
@@ -75,4 +78,4 @@ const server = createServer(async (req, res) => {
 server.listen(port, host, () => console.log(`Lanternwake: http://${host}:${port}`));
 
 for (const signal of ["SIGINT", "SIGTERM"])
-  process.on(signal, () => server.close(() => process.exit(0)));
+  {process.on(signal, () => server.close(() => process.exit(0)));}

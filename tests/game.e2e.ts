@@ -44,14 +44,14 @@ test("first echo reveals the mechanic and all four rooms finish through keyboard
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("console", (e) => {
-    if (e.type() === "error") errors.push(e.text());
+    if (e.type() === "error") {errors.push(e.text());}
   });
   const outgoing: string[] = [];
   page.on("request", (request) => {
     const url = new URL(request.url());
 
     if (["http:", "https:"].includes(url.protocol) && url.origin !== "http://127.0.0.1:4317")
-      outgoing.push(request.url());
+      {outgoing.push(request.url());}
   });
   await open(page);
   await expect(page).toHaveTitle(/Lanternwake/);
@@ -86,7 +86,8 @@ test("first echo reveals the mechanic and all four rooms finish through keyboard
 
     await expect(page.getByTestId("state")).toHaveAttribute("data-won", "true");
 
-    if (chapter === 3) await page.screenshot({ path: "evidence/morning.png", fullPage: true });
+    if (chapter === 3) {await page.screenshot({ path: "evidence/morning.png", fullPage: true });}
+
     await page
       .getByRole("button", {
         name: chapter === 3 ? "Wander again" : "The next little moment",
@@ -154,11 +155,11 @@ test("service worker caches the real artwork and game; offline reload restores a
   await steps(page, ["right"]);
   await page.evaluate(async () => {
     if (!navigator.serviceWorker.controller)
-      await new Promise<void>((resolve) =>
+      {await new Promise<void>((resolve) =>
         navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), {
           once: true,
         }),
-      );
+      );}
   });
   await context.setOffline(true);
   await page.reload();
@@ -185,7 +186,8 @@ test("mobile touch controls finish a room and reduced-motion layout does not ove
   await page.waitForTimeout(100);
   await page.screenshot({ path: "evidence/mobile.png", fullPage: true });
 
-  for (let i = 0; i < 4; i++) await right.click();
+  for (let i = 0; i < 4; i++) {await right.click();}
+
   await expect(page.getByTestId("state")).toHaveAttribute("data-won", "true");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole("button", { name: "The next little moment" }).click();
@@ -263,13 +265,14 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
         const context = Reflect.construct(target, args);
 
         if (!(context instanceof NativeAudioContext))
-          throw new Error("Expected native AudioContext");
+          {throw new Error("Expected native AudioContext");}
+
         trace.contexts.push(context);
         const create = context.createOscillator.bind(context);
         context.createOscillator = () => {
-          const oscillator = create(),
-            start = oscillator.start.bind(oscillator),
-            disconnect = oscillator.disconnect.bind(oscillator);
+          const oscillator = create();
+            const start = oscillator.start.bind(oscillator);
+            const disconnect = oscillator.disconnect.bind(oscillator);
 
           oscillator.start = (when = 0) => {
             trace.starts.push({
@@ -309,7 +312,7 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
   await page.evaluate(() => {
     window.audioTrace.starts = [];
 
-    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    if (document.activeElement instanceof HTMLElement) {document.activeElement.blur();}
   });
   await steps(page, ["wait", "wait"]);
   const echoes = await page.evaluate(() => window.audioTrace.starts);
@@ -328,12 +331,12 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
   // Many immediate actions exercise the voice cap before their envelopes can finish.
   await page.evaluate(() => {
     for (let i = 0; i < 70; i++)
-      document.body.dispatchEvent(
+      {document.body.dispatchEvent(
         new KeyboardEvent("keydown", {
           bubbles: true,
           key: i % 2 ? "ArrowLeft" : "ArrowRight",
         }),
-      );
+      );}
   });
   expect(await page.evaluate(() => window.audioTrace.maxActive)).toBe(16);
   await page.getByRole("button", { name: "Mute sound" }).click();

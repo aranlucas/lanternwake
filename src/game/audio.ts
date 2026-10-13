@@ -25,7 +25,8 @@ export class GardenAudio {
     try {
       this.context ??= new AudioContext();
 
-      if (this.context.state === "suspended") await this.context.resume();
+      if (this.context.state === "suspended") {await this.context.resume();}
+
       this.play("rewind");
     } catch (error) {
       this.enabled = false;
@@ -33,7 +34,7 @@ export class GardenAudio {
     }
   }
   playStep(before: GameState, after: GameState): void {
-    for (const note of notesForStep(before, after)) this.schedule(note);
+    for (const note of notesForStep(before, after)) {this.schedule(note);}
   }
   play(kind: "rewind" | "win" | "blocked"): void {
     const notes =
@@ -60,17 +61,17 @@ export class GardenAudio {
   }
   private schedule(note: GardenNote, delay = 0): void {
     if (!this.enabled || !this.context || this.context.state !== "running" || document.hidden)
-      return;
+      {return;}
 
     // Rapid input stays bounded; cancel the oldest voice rather than accumulating nodes.
-    while (this.voices.size >= 16) this.stop(this.voices.values().next().value!);
+    while (this.voices.size >= 16) {this.stop(this.voices.values().next().value!);}
 
-    const ctx = this.context,
-      start = ctx.currentTime + delay;
+    const ctx = this.context;
+      const start = ctx.currentTime + delay;
 
-    const oscillator = ctx.createOscillator(),
-      gain = ctx.createGain(),
-      pan = ctx.createStereoPanner();
+    const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const pan = ctx.createStereoPanner();
 
     oscillator.type = note.waveform;
     oscillator.frequency.value = note.frequency;
@@ -98,15 +99,15 @@ export class GardenAudio {
     this.disconnect(voice);
   }
   silence(): void {
-    for (const voice of this.voices) this.stop(voice);
+    for (const voice of this.voices) {this.stop(voice);}
   }
   async suspend(): Promise<void> {
     this.silence();
 
-    if (this.context?.state === "running") await this.context.suspend();
+    if (this.context?.state === "running") {await this.context.suspend();}
   }
   async resume(): Promise<void> {
-    if (this.enabled && this.context?.state === "suspended") await this.context.resume();
+    if (this.enabled && this.context?.state === "suspended") {await this.context.resume();}
   }
   async dispose(): Promise<void> {
     await this.suspend();

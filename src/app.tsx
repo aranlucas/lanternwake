@@ -12,21 +12,21 @@ import type { Direction, GameState, Level } from "./game/types.ts";
 
 function guidance(level: Level, state: GameState): string {
   if (state.message && state.message !== "Every step is a moment you can borrow.")
-    return state.message;
+    {return state.message;}
 
   if (state.echoes.length === 0 && activePads(level, state).length)
-    return "Here is a good place to rewind. Your echo will hold this light.";
+    {return "Here is a good place to rewind. Your echo will hold this light.";}
 
-  if (state.echoes.length === 0) return level.hints[0];
+  if (state.echoes.length === 0) {return level.hints[0];}
 
   if (level.id === "company")
-    return "Your echo keeps the light. Walk through the gate to the bell.";
+    {return "Your echo keeps the light. Walk through the gate to the bell.";}
 
   if (level.id === "beat" && state.echoes.length === 1)
-    return "Find the star pad across the moon bridge. Wait for its bright beats.";
+    {return "Find the star pad across the moon bridge. Wait for its bright beats.";}
 
   if (state.echoes.length < level.pads.length)
-    return "Another light is waiting. Leave an echo on its pad.";
+    {return "Another light is waiting. Leave an echo on its pad.";}
 
   return "Your company is complete. Carry the last light to the bell.";
 }
@@ -44,14 +44,14 @@ export default function App() {
     resume,
   } = useGame();
 
-  const [journal, setJournal] = useState(false),
-    [showHint, setShowHint] = useState(false),
-    [offline, setOffline] = useState(!navigator.onLine);
+  const [journal, setJournal] = useState(false);
+    const [showHint, setShowHint] = useState(false);
+    const [offline, setOffline] = useState(!navigator.onLine);
 
   const [cacheReady, setCacheReady] = useState(false);
 
-  const chapter = LEVELS.findIndex((room) => room.id === level.id),
-    final = chapter === LEVELS.length - 1;
+  const chapter = LEVELS.findIndex((room) => room.id === level.id);
+    const final = chapter === LEVELS.length - 1;
 
   const move = useCallback((direction: Direction) => act({ type: "step", direction }), [act]);
 
@@ -71,12 +71,13 @@ export default function App() {
         event.metaKey ||
         event.altKey
       )
-        return;
+        {return;}
+
       const target = event.target;
 
-      if (!(target instanceof HTMLElement)) return;
+      if (!(target instanceof HTMLElement)) {return;}
 
-      if (target.matches("input, textarea, select, [contenteditable=true]")) return;
+      if (target.matches("input, textarea, select, [contenteditable=true]")) {return;}
 
       const directions = new Map<string, Direction>([
         ["ArrowUp", "up"],
@@ -106,8 +107,8 @@ export default function App() {
       } else if (event.key === "Escape") {
         event.preventDefault();
 
-        if (state.paused) resume();
-        else act({ type: "pause", value: true });
+        if (state.paused) {resume();}
+        else {act({ type: "pause", value: true });}
       }
     };
 

@@ -9,14 +9,14 @@ type WorldProps = {
 };
 
 export function GameWorld({ level, state, onMove }: WorldProps) {
-  const host = useRef<HTMLDivElement>(null),
-    scene = useRef<GardenScene | null>(null),
-    move = useRef(onMove);
+  const host = useRef<HTMLDivElement>(null);
+    const scene = useRef<GardenScene | null>(null);
+    const move = useRef(onMove);
 
   const [ready, setReady] = useState(false);
   move.current = onMove;
   useEffect(() => {
-    if (!host.current) return;
+    if (!host.current) {return;}
 
     const garden = new GardenScene(
       level,
