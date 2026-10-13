@@ -11,7 +11,13 @@ const DELTAS: Record<Direction, Point> = {
 export const samePoint = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
 
 export function currentPosition(state: GameState): Point {
-  return state.path.at(-1);
+  const position = state.path.at(-1);
+
+  if (!position) {
+    throw new Error("A game path must contain its spawn point.");
+  }
+
+  return position;
 }
 
 export function echoPosition(path: Point[], beat: number): Point {
