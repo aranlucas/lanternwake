@@ -7,8 +7,9 @@ export const ASSETS = {
   atlas: "/assets/atlas.png",
 };
 
-const WIDTH = 1536,
-  HEIGHT = 1024;
+const WIDTH = 1536;
+
+  const HEIGHT = 1024;
 
 const tilePoint = (p: Point) => ({ x: 265 + p.x * 110, y: 195 + p.y * 90 });
 
@@ -47,11 +48,11 @@ export class GardenScene extends Phaser.Scene {
     // Frame extraction uses the atlas directly; source raster files are unmodified.
     const source = this.textures.get("atlas").getSourceImage();
 
-    const cellWidth = Math.floor(source.width / 4),
-      cellHeight = Math.floor(source.height / 3);
+    const cellWidth = Math.floor(source.width / 4);
+      const cellHeight = Math.floor(source.height / 3);
 
     for (let frame = 0; frame < 12; frame++)
-      this.textures
+      {this.textures
         .get("atlas")
         .add(
           String(frame),
@@ -60,15 +61,16 @@ export class GardenScene extends Phaser.Scene {
           Math.floor(frame / 4) * cellHeight,
           cellWidth,
           cellHeight,
-        );
+        );}
+
     this.world = this.add.container(0, 0);
     this.ready = true;
     this.render(this.level, this.state, true);
     this.onReady();
   }
   private image(point: Point, frame: number, size = 172): Phaser.GameObjects.Image {
-    const p = tilePoint(point),
-      image = this.add.image(p.x, p.y, "atlas", String(frame)).setDisplaySize(size, size * 0.889);
+    const p = tilePoint(point);
+      const image = this.add.image(p.x, p.y, "atlas", String(frame)).setDisplaySize(size, size * 0.889);
 
     this.world!.add(image);
 
@@ -79,12 +81,14 @@ export class GardenScene extends Phaser.Scene {
     this.level = level;
     this.state = state;
 
-    if (!this.ready || !this.world) return;
+    if (!this.ready || !this.world) {return;}
+
     this.world.removeAll(true);
     const lit = activePads(level, state);
     level.map.forEach((row, y) =>
       [...row].forEach((tile, x) => {
-        if (tile === "_") return;
+        if (tile === "_") {return;}
+
         const pad = level.pads.find((p) => p.x === x && p.y === y);
 
         const baseFrame = pad ? (pad.id === "a" ? 2 : pad.id === "b" ? 8 : 10) : 1;
@@ -92,20 +96,22 @@ export class GardenScene extends Phaser.Scene {
         const frame = pad && lit.includes(pad.id) ? baseFrame + 1 : baseFrame;
         const stone = this.image({ x, y }, frame);
 
-        if (tile === "p") stone.setTint(0xadebfa).setAlpha(bridgeOpen(state.beat) ? 1 : 0.24);
+        if (tile === "p") {stone.setTint(0xadebfa).setAlpha(bridgeOpen(state.beat) ? 1 : 0.24);}
+
         stone.setInteractive({ useHandCursor: true }).on("pointerdown", () => {
-          const player = currentPosition(this.state),
-            dx = x - player.x,
-            dy = y - player.y;
+          const player = currentPosition(this.state);
+            const dx = x - player.x;
+            const dy = y - player.y;
 
           if (Math.abs(dx) + Math.abs(dy) === 1)
-            this.onMove(dx === 1 ? "right" : dx === -1 ? "left" : dy === 1 ? "down" : "up");
+            {this.onMove(dx === 1 ? "right" : dx === -1 ? "left" : dy === 1 ? "down" : "up");}
         });
       }),
     );
 
     for (const gate of level.gates)
-      this.image(gate, gateOpen(level, state, gate) ? 5 : 4, 210).setDepth(100 + gate.y);
+      {this.image(gate, gateOpen(level, state, gate) ? 5 : 4, 210).setDepth(100 + gate.y);}
+
     this.ring?.destroy();
     this.ring = this.image(level.goal, state.won ? 7 : 6, 216).setDepth(110);
 
@@ -114,22 +120,25 @@ export class GardenScene extends Phaser.Scene {
       currentPosition(state),
     ];
 
-    while (this.actors.length > occupants.length) this.actors.pop()!.destroy();
+    while (this.actors.length > occupants.length) {this.actors.pop()!.destroy();}
+
     occupants.forEach((point, i) => {
-      const player = i === occupants.length - 1,
-        p = tilePoint(point);
+      const player = i === occupants.length - 1;
+        const p = tilePoint(point);
 
       const previous = this.actors[i];
 
       if (!previous)
-        this.actors[i] = this.add.image(p.x, p.y - 24, "atlas", "0").setDisplaySize(166, 148);
+        {this.actors[i] = this.add.image(p.x, p.y - 24, "atlas", "0").setDisplaySize(166, 148);}
+
       const actor = this.actors[i];
       actor
         .setDepth(200 + point.y * 10 + i)
         .setAlpha(player ? 1 : 0.64)
         .clearTint();
 
-      if (!player) actor.setTint(TINTS[i % 3]);
+      if (!player) {actor.setTint(TINTS[i % 3]);}
+
       this.tweens.killTweensOf(actor);
 
       const stacked = occupants.filter((p2) => p2.x === point.x && p2.y === point.y).length > 1;
@@ -146,24 +155,24 @@ export class GardenScene extends Phaser.Scene {
       };
 
       if (instant || changedLevel || this.reducedMotion)
-        actor.setPosition(destination.x, destination.y);
+        {actor.setPosition(destination.x, destination.y);}
       else
-        this.tweens.add({
+        {this.tweens.add({
           targets: actor,
           ...destination,
           duration: 140,
           ease: "Sine.easeInOut",
-        });
+        });}
     });
 
     if (state.won && !this.reducedMotion)
-      this.tweens.add({
+      {this.tweens.add({
         targets: this.ring,
         alpha: 0.8,
         duration: 800,
         yoyo: true,
         repeat: 1,
-      });
+      });}
   }
 }
 

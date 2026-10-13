@@ -34,8 +34,8 @@ export function useGame() {
   }, []);
 
   const act = useCallback((action: GameAction) => {
-    const before = current.current,
-      after = transition(levelById(before.levelId), before, action);
+    const before = current.current;
+      const after = transition(levelById(before.levelId), before, action);
 
     current.current = after;
     setState(after);
@@ -43,16 +43,16 @@ export function useGame() {
     if (action.type === "step" && !before.paused && !before.won) {
       audio.current?.playStep(before, after);
 
-      if (after.won) audio.current?.play("win");
-      else if (after.beat === before.beat) audio.current?.play("blocked");
+      if (after.won) {audio.current?.play("win");}
+      else if (after.beat === before.beat) {audio.current?.play("blocked");}
     }
 
     if (action.type === "rewind" && after.echoes.length > before.echoes.length)
-      audio.current?.play("rewind");
+      {audio.current?.play("rewind");}
 
-    if (action.type === "pause" && action.value) void audio.current?.suspend();
+    if (action.type === "pause" && action.value) {void audio.current?.suspend();}
 
-    if (action.type === "restart") audio.current?.silence();
+    if (action.type === "restart") {audio.current?.silence();}
   }, []);
 
   const chooseLevel = useCallback((id: string) => {
@@ -75,9 +75,9 @@ export function useGame() {
 
   useEffect(() => {
     if (state.won)
-      setCompleted((previous) =>
+      {setCompleted((previous) =>
         previous.includes(state.levelId) ? previous : [...previous, state.levelId],
-      );
+      );}
   }, [state.won, state.levelId]);
   useEffect(() => {
     try {
@@ -88,7 +88,7 @@ export function useGame() {
   }, [state, completed, sound]);
   useEffect(() => {
     const visibility = () => {
-      if (document.hidden) act({ type: "pause", value: true });
+      if (document.hidden) {act({ type: "pause", value: true });}
     };
 
     document.addEventListener("visibilitychange", visibility);

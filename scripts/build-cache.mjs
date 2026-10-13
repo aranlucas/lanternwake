@@ -17,7 +17,7 @@ const paths = (await files("dist")).filter((path) => !path.endsWith("sw.js")).so
 
 const hash = createHash("sha256");
 
-for (const path of paths) hash.update(await readFile(path));
+for (const path of paths) {hash.update(await readFile(path));}
 
 const version = hash.digest("hex").slice(0, 12);
 

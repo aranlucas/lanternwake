@@ -22,16 +22,16 @@ export function GameDialog({ labelId, onDismiss, children }: GameDialogProps) {
       className="game-dialog"
       aria-labelledby={labelId}
       onKeyDown={(event) => {
-        if (event.key !== "Tab") return;
+        if (event.key !== "Tab") {return;}
 
         const buttons = Array.from(
           event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"),
         );
 
-        const first = buttons[0],
-          last = buttons.at(-1);
+        const first = buttons[0];
+          const last = buttons.at(-1);
 
-        if (!first || !last) return;
+        if (!first || !last) {return;}
 
         // Native modality makes the background inert; explicit wrapping also keeps
         // Tab from moving into browser chrome at the end of this small button group.

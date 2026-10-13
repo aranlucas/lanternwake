@@ -11,13 +11,13 @@ try {
     const NativeAudioContext = window.AudioContext;
     window.AudioContext = new Proxy(NativeAudioContext, {
       construct(target, args) {
-        const context = Reflect.construct(target, args),
-          output = context.createMediaStreamDestination();
+        const context = Reflect.construct(target, args);
+          const output = context.createMediaStreamDestination();
 
         const create = context.createStereoPanner.bind(context);
         context.createStereoPanner = () => {
-          const pan = create(),
-            connect = pan.connect.bind(pan);
+          const pan = create();
+            const connect = pan.connect.bind(pan);
 
           pan.connect = (destination) => {
             connect(output);
@@ -90,8 +90,8 @@ try {
       audio.getChannelData(index),
     );
 
-    const bytes = new Uint8Array(44 + audio.length * audio.numberOfChannels * 2),
-      view = new DataView(bytes.buffer);
+    const bytes = new Uint8Array(44 + audio.length * audio.numberOfChannels * 2);
+      const view = new DataView(bytes.buffer);
 
     const label = (offset, text) =>
       [...text].forEach((char, index) => view.setUint8(offset + index, char.charCodeAt(0)));
@@ -110,20 +110,20 @@ try {
     label(36, "data");
     view.setUint32(40, bytes.length - 44, true);
 
-    let peak = 0,
-      offset = 44,
-      binary = "";
+    let peak = 0;
+      let offset = 44;
+      let binary = "";
 
     for (let frame = 0; frame < audio.length; frame++)
-      for (const channel of channels) {
+      {for (const channel of channels) {
         const value = Math.max(-1, Math.min(1, channel[frame]));
         peak = Math.max(peak, Math.abs(value));
         view.setInt16(offset, Math.round(value * 32767), true);
         offset += 2;
-      }
+      }}
 
     for (let offset = 0; offset < bytes.length; offset += 8192)
-      binary += String.fromCharCode(...bytes.subarray(offset, offset + 8192));
+      {binary += String.fromCharCode(...bytes.subarray(offset, offset + 8192));}
 
     return {
       base64: btoa(binary),
@@ -134,7 +134,8 @@ try {
   });
 
   if (recording.peak < 0.001 || recording.duration < 5)
-    throw new Error("Audio recording is silent or incomplete");
+    {throw new Error("Audio recording is silent or incomplete");}
+
   await mkdir("evidence", { recursive: true });
   await writeFile("evidence/echo-choir.wav", Buffer.from(recording.base64, "base64"));
   console.log(

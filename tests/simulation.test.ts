@@ -25,14 +25,14 @@ function play(level: Level, paths: Direction[][]): GameState {
       );
     }
 
-    if (index < paths.length - 1) state = transition(level, state, { type: "rewind" });
+    if (index < paths.length - 1) {state = transition(level, state, { type: "rewind" });}
   });
 
   return state;
 }
 
 for (const level of LEVELS)
-  test(`${level.title}: authored solution cooperates with all required echoes`, () => {
+  {test(`${level.title}: authored solution cooperates with all required echoes`, () => {
     const state = play(level, level.solutions);
     assert.equal(state.won, true);
     assert.deepEqual(currentPosition(state), level.goal);
@@ -50,7 +50,7 @@ for (const level of LEVELS)
 
     assert.ok(saved, "Winning state must round-trip through validated local persistence");
     assert.equal(saved.state.won, true);
-  });
+  });}
 
 test("a player cannot hold a pad while crossing its gate alone", () => {
   const level = LEVELS[0];
@@ -69,8 +69,8 @@ test("a player cannot hold a pad while crossing its gate alone", () => {
 });
 
 test("echo replays exact recorded positions and holds its final position", () => {
-  const level = LEVELS[0],
-    state = play(level, [level.solutions[0]]);
+  const level = LEVELS[0];
+    const state = play(level, [level.solutions[0]]);
 
   const rewound = transition(level, state, { type: "rewind" });
   assert.deepEqual(rewound.echoes[0].path, state.path);
@@ -85,7 +85,8 @@ test("moon bridge refuses sleeping-beat crossing without advancing time", () => 
   state = transition(level, state, { type: "rewind" });
 
   for (const direction of ["right", "right", "right", "right"] as const)
-    state = transition(level, state, { type: "step", direction });
+    {state = transition(level, state, { type: "step", direction });}
+
   const blocked = transition(level, state, { type: "step", direction: "up" });
   assert.equal(blocked.beat, 4);
   assert.match(blocked.message, /bridge sleeps/);
@@ -134,7 +135,8 @@ test("empty echoes and the fourth echo are refused; full beat budget remains und
   }
 
   for (let i = 0; i < 16; i++)
-    state = transition(level, state, { type: "step", direction: "wait" });
+    {state = transition(level, state, { type: "step", direction: "wait" });}
+
   assert.equal(transition(level, state, { type: "rewind" }).echoes.length, 3);
   assert.equal(transition(level, state, { type: "step", direction: "wait" }).beat, 16);
   assert.equal(transition(level, state, { type: "undo" }).beat, 15);
