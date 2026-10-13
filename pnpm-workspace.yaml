@@ -1,2 +1,4 @@
 minimumReleaseAgeExclude:
   - "@types/node@26.6.5"
+  - "@aranlucas/*"
+  - "@oxlint/plugins@1.88.0"
