@@ -70,7 +70,13 @@ export class GardenAudio {
 
     // Rapid input stays bounded; cancel the oldest voice rather than accumulating nodes.
     while (this.voices.size >= 16) {
-      this.stop(this.voices.values().next().value!);
+      const oldest = this.voices.values().next();
+
+      if (oldest.done) {
+        break;
+      }
+
+      this.stop(oldest.value);
     }
 
     const ctx = this.context;
@@ -91,7 +97,7 @@ export class GardenAudio {
     pan.connect(ctx.destination);
     const voice = { oscillator, gain, pan };
     this.voices.add(voice);
-    oscillator.onended = () => this.disconnect(voice);
+    oscillator.addEventListener("ended", () => this.disconnect(voice), { once: true });
     oscillator.start(start);
     oscillator.stop(start + note.duration);
   }

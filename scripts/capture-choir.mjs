@@ -14,8 +14,11 @@ try {
       construct(target, args) {
         /** @type {unknown} */
         const context = Reflect.construct(target, args);
-        if (!(context instanceof NativeAudioContext))
+
+        if (!(context instanceof NativeAudioContext)) {
           throw new Error("Expected native AudioContext");
+        }
+
         const output = context.createMediaStreamDestination();
 
         const create = context.createStereoPanner.bind(context);
@@ -51,7 +54,10 @@ try {
   await page.getByRole("button", { name: "Open journal", exact: true }).click();
   await page.getByRole("button", { name: /Two wishes/ }).click();
   await page.evaluate(() => {
-    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
     window.choirCapture.recorder.start();
   });
 
@@ -100,7 +106,7 @@ try {
     /** @param {number} position @param {string} text */
     const label = (position, text) => {
       for (const [index, char] of text.split("").entries()) {
-        view.setUint8(position + index, char.charCodeAt(0));
+        view.setUint8(position + index, char.codePointAt(0) ?? 0);
       }
     };
 
@@ -132,7 +138,7 @@ try {
     }
 
     for (let byteOffset = 0; byteOffset < bytes.length; byteOffset += 8192) {
-      binary += String.fromCharCode(...bytes.subarray(byteOffset, byteOffset + 8192));
+      binary += String.fromCodePoint(...bytes.subarray(byteOffset, byteOffset + 8192));
     }
 
     return {
@@ -149,13 +155,13 @@ try {
 
   await mkdir("evidence", { recursive: true });
   await writeFile("evidence/echo-choir.wav", Buffer.from(recording.base64, "base64"));
-  console.log(
+  process.stdout.write(
     JSON.stringify({
       path: "evidence/echo-choir.wav",
       duration: recording.duration,
       sampleRate: recording.sampleRate,
       peak: recording.peak,
-    }),
+    }) + "\n",
   );
 } finally {
   await browser.close();

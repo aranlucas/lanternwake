@@ -14,6 +14,7 @@ import type { Direction, GameAction, GameState, Level } from "../src/game/types.
 
 function play(level: Level, paths: Direction[][]): GameState {
   let state = initialState(level);
+
   for (const [index, path] of paths.entries()) {
     for (const direction of path) {
       const previous = state.beat;
@@ -149,11 +150,11 @@ await test("empty echoes and the fourth echo are refused; full beat budget remai
   assert.equal(transition(level, state, { type: "undo" }).beat, 15);
 });
 
+const make = (replacement: GameState) =>
+  JSON.stringify({ version: 1, state: replacement, completed: [] });
+
 await test("save validation rejects malformed, teleporting, stale-version, forged and oversized states", () => {
   const state = initialState(LEVELS[0]);
-
-  const make = (replacement: GameState) =>
-    JSON.stringify({ version: 1, state: replacement, completed: [] });
 
   assert.equal(parseSave("not json"), null);
   assert.equal(parseSave("x".repeat(40_001)), null);

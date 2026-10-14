@@ -86,7 +86,7 @@ const server = createServer((req, res) => {
   });
 });
 
-server.listen(port, host, () => console.log(`Lanternwake: http://${host}:${port}`));
+server.listen(port, host, () => process.stdout.write(`Lanternwake: http://${host}:${port}\n`));
 
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => server.close(() => process.exit(0)));

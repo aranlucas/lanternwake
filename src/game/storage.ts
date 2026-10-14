@@ -40,10 +40,9 @@ function parsePath(value: Point[], level: Level): Point[] | null {
       return null;
     }
 
-    if (
-      path.length &&
-      Math.abs(path.at(-1)!.x - point.x) + Math.abs(path.at(-1)!.y - point.y) > 1
-    ) {
+    const previous = path.at(-1);
+
+    if (previous && Math.abs(previous.x - point.x) + Math.abs(previous.y - point.y) > 1) {
       return null;
     }
 

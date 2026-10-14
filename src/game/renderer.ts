@@ -72,11 +72,16 @@ export class GardenScene extends Scene {
   }
   private image(point: Point, frame: number, size = 172): GameObjects.Image {
     const p = tilePoint(point);
+
     const image = this.add
       .image(p.x, p.y, "atlas", String(frame))
       .setDisplaySize(size, size * 0.889);
 
-    this.world!.add(image);
+    if (!this.world) {
+      throw new Error("Garden scene is not ready");
+    }
+
+    this.world.add(image);
 
     return image;
   }
@@ -91,6 +96,7 @@ export class GardenScene extends Scene {
 
     this.world.removeAll(true);
     const lit = activePads(level, state);
+
     for (const [y, row] of level.map.entries()) {
       for (const [x, tile] of row.split("").entries()) {
         if (tile === "_") {
@@ -133,7 +139,7 @@ export class GardenScene extends Scene {
     ];
 
     while (this.actors.length > occupants.length) {
-      this.actors.pop()!.destroy();
+      this.actors.pop()?.destroy();
     }
 
     for (const [i, point] of occupants.entries()) {

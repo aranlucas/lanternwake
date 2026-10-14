@@ -40,4 +40,4 @@ self.addEventListener("fetch", event => {
 
 await writeFile("dist/sw.js", source);
 
-console.log(`Offline cache ${version}: ${urls.length} local files`);
+process.stdout.write(`Offline cache ${version}: ${urls.length} local files\n`);
