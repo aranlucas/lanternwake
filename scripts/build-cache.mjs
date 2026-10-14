@@ -1,23 +1,28 @@
 import { createHash } from "node:crypto";
 import { readdir, readFile, writeFile } from "node:fs/promises";
 
+/** @param {string} dir @returns {Promise<string[]>} */
 async function files(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
 
   return (
     await Promise.all(
-      entries.map(async (entry) =>
-        entry.isDirectory() ? files(`${dir}/${entry.name}`) : `${dir}/${entry.name}`,
+      entries.map((entry) =>
+        entry.isDirectory()
+          ? files(`${dir}/${entry.name}`)
+          : Promise.resolve(`${dir}/${entry.name}`),
       ),
     )
   ).flat();
 }
 
-const paths = (await files("dist")).filter((path) => !path.endsWith("sw.js")).sort();
+const paths = (await files("dist")).filter((path) => !path.endsWith("sw.js")).toSorted();
 
 const hash = createHash("sha256");
 
-for (const path of paths) {hash.update(await readFile(path));}
+for (const content of await Promise.all(paths.map((path) => readFile(path)))) {
+  hash.update(content);
+}
 
 const version = hash.digest("hex").slice(0, 12);
 

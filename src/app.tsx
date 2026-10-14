@@ -11,22 +11,29 @@ import { useGame } from "./game/use-game.ts";
 import type { Direction, GameState, Level } from "./game/types.ts";
 
 function guidance(level: Level, state: GameState): string {
-  if (state.message && state.message !== "Every step is a moment you can borrow.")
-    {return state.message;}
+  if (state.message && state.message !== "Every step is a moment you can borrow.") {
+    return state.message;
+  }
 
-  if (state.echoes.length === 0 && activePads(level, state).length)
-    {return "Here is a good place to rewind. Your echo will hold this light.";}
+  if (state.echoes.length === 0 && activePads(level, state).length) {
+    return "Here is a good place to rewind. Your echo will hold this light.";
+  }
 
-  if (state.echoes.length === 0) {return level.hints[0];}
+  if (state.echoes.length === 0) {
+    return level.hints[0];
+  }
 
-  if (level.id === "company")
-    {return "Your echo keeps the light. Walk through the gate to the bell.";}
+  if (level.id === "company") {
+    return "Your echo keeps the light. Walk through the gate to the bell.";
+  }
 
-  if (level.id === "beat" && state.echoes.length === 1)
-    {return "Find the star pad across the moon bridge. Wait for its bright beats.";}
+  if (level.id === "beat" && state.echoes.length === 1) {
+    return "Find the star pad across the moon bridge. Wait for its bright beats.";
+  }
 
-  if (state.echoes.length < level.pads.length)
-    {return "Another light is waiting. Leave an echo on its pad.";}
+  if (state.echoes.length < level.pads.length) {
+    return "Another light is waiting. Leave an echo on its pad.";
+  }
 
   return "Your company is complete. Carry the last light to the bell.";
 }
@@ -45,13 +52,13 @@ export default function App() {
   } = useGame();
 
   const [journal, setJournal] = useState(false);
-    const [showHint, setShowHint] = useState(false);
-    const [offline, setOffline] = useState(!navigator.onLine);
+  const [showHint, setShowHint] = useState(false);
+  const [offline, setOffline] = useState(!navigator.onLine);
 
   const [cacheReady, setCacheReady] = useState(false);
 
   const chapter = LEVELS.findIndex((room) => room.id === level.id);
-    const final = chapter === LEVELS.length - 1;
+  const final = chapter === LEVELS.length - 1;
 
   const move = useCallback((direction: Direction) => act({ type: "step", direction }), [act]);
 
@@ -70,14 +77,19 @@ export default function App() {
         event.ctrlKey ||
         event.metaKey ||
         event.altKey
-      )
-        {return;}
+      ) {
+        return;
+      }
 
       const target = event.target;
 
-      if (!(target instanceof HTMLElement)) {return;}
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
 
-      if (target.matches("input, textarea, select, [contenteditable=true]")) {return;}
+      if (target.matches("input, textarea, select, [contenteditable=true]")) {
+        return;
+      }
 
       const directions = new Map<string, Direction>([
         ["ArrowUp", "up"],
@@ -107,8 +119,11 @@ export default function App() {
       } else if (event.key === "Escape") {
         event.preventDefault();
 
-        if (state.paused) {resume();}
-        else {act({ type: "pause", value: true });}
+        if (state.paused) {
+          resume();
+        } else {
+          act({ type: "pause", value: true });
+        }
       }
     };
 
@@ -127,6 +142,7 @@ export default function App() {
         .then(async () => {
           await navigator.serviceWorker.ready;
           setCacheReady(true);
+          return undefined;
         })
         .catch(() => setCacheReady(false));
     }
@@ -215,7 +231,7 @@ export default function App() {
             <Icon name="lantern" size={40} />
             <h2 id="pause-title">The garden can wait.</h2>
             <p>Your echoes are right where you left them.</p>
-            <button className="resume-button" autoFocus onClick={resume}>
+            <button className="resume-button" onClick={resume}>
               Keep wandering
             </button>
           </div>
@@ -229,7 +245,7 @@ export default function App() {
             <p>{level.story}</p>
             <button
               className="resume-button"
-              autoFocus
+
               onClick={() => {
                 resume();
                 chooseLevel(final ? LEVELS[0].id : LEVELS[chapter + 1].id);

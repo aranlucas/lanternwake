@@ -11,7 +11,13 @@ const DELTAS: Record<Direction, Point> = {
 export const samePoint = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
 
 export function currentPosition(state: GameState): Point {
-  return state.path.at(-1);
+  const position = state.path.at(-1);
+
+  if (!position) {
+    throw new Error("A game path must contain its spawn point.");
+  }
+
+  return position;
 }
 
 export function echoPosition(path: Point[], beat: number): Point {
@@ -61,17 +67,19 @@ export function initialState(level: Level): GameState {
 }
 
 function recordEcho(level: Level, state: GameState): GameState {
-  if (state.path.length === 1)
-    {return {
+  if (state.path.length === 1) {
+    return {
       ...state,
       message: "Take a step first. Give your echo somewhere to go.",
-    };}
+    };
+  }
 
-  if (state.echoes.length >= level.maxEchoes)
-    {return {
+  if (state.echoes.length >= level.maxEchoes) {
+    return {
       ...state,
       message: "Three echoes is a full constellation. Undo an echo to try another path.",
-    };}
+    };
+  }
 
   return {
     ...state,
@@ -87,18 +95,28 @@ function recordEcho(level: Level, state: GameState): GameState {
 }
 
 export function transition(level: Level, state: GameState, action: GameAction): GameState {
-  if (action.type === "restart") {return initialState(level);}
+  if (action.type === "restart") {
+    return initialState(level);
+  }
 
-  if (action.type === "pause") {return { ...state, paused: action.value };}
+  if (action.type === "pause") {
+    return { ...state, paused: action.value };
+  }
 
-  if (state.paused || state.won) {return state;}
+  if (state.paused || state.won) {
+    return state;
+  }
 
-  if (action.type === "rewind") {return recordEcho(level, state);}
+  if (action.type === "rewind") {
+    return recordEcho(level, state);
+  }
 
   if (action.type === "undo-echo") {
     const echo = state.echoes.at(-1);
 
-    if (!echo) {return state;}
+    if (!echo) {
+      return state;
+    }
 
     return {
       ...state,
@@ -110,7 +128,9 @@ export function transition(level: Level, state: GameState, action: GameAction): 
   }
 
   if (action.type === "undo") {
-    if (state.beat === 0) {return state;}
+    if (state.beat === 0) {
+      return state;
+    }
 
     return {
       ...state,
@@ -120,37 +140,41 @@ export function transition(level: Level, state: GameState, action: GameAction): 
     };
   }
 
-  if (state.beat >= level.maxBeats)
-    {return {
+  if (state.beat >= level.maxBeats) {
+    return {
       ...state,
       message: "This moment is full. Rewind to keep the path, or undo a step.",
-    };}
+    };
+  }
 
   const before = currentPosition(state);
-    const delta = DELTAS[action.direction];
+  const delta = DELTAS[action.direction];
 
   const target = { x: before.x + delta.x, y: before.y + delta.y };
-    const nextBeat = state.beat + 1;
+  const nextBeat = state.beat + 1;
 
   const tile = level.map[target.y]?.[target.x];
 
-  if (!tile || tile === "_")
-    {return {
+  if (!tile || tile === "_") {
+    return {
       ...state,
       message: "Only the stepping stones remember your footsteps.",
-    };}
+    };
+  }
 
-  if (!gateOpen(level, state, target, nextBeat, target))
-    {return {
+  if (!gateOpen(level, state, target, nextBeat, target)) {
+    return {
       ...state,
       message: "The gate needs its lights held. Leave an echo on a matching pad.",
-    };}
+    };
+  }
 
-  if (tile === "p" && !bridgeOpen(nextBeat) && action.direction !== "wait")
-    {return {
+  if (tile === "p" && !bridgeOpen(nextBeat) && action.direction !== "wait") {
+    return {
       ...state,
       message: "The moon bridge sleeps on this beat. Wait, then try again.",
-    };}
+    };
+  }
 
   const next = {
     ...state,

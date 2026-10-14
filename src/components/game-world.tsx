@@ -10,17 +10,22 @@ type WorldProps = {
 
 export function GameWorld({ level, state, onMove }: WorldProps) {
   const host = useRef<HTMLDivElement>(null);
-    const scene = useRef<GardenScene | null>(null);
-    const move = useRef(onMove);
+  const scene = useRef<GardenScene | null>(null);
+  const move = useRef(onMove);
 
   const [ready, setReady] = useState(false);
-  move.current = onMove;
+  const [initial] = useState(() => ({ level, state }));
   useEffect(() => {
-    if (!host.current) {return;}
+    move.current = onMove;
+  }, [onMove]);
+  useEffect(() => {
+    if (!host.current) {
+      return undefined;
+    }
 
     const garden = new GardenScene(
-      level,
-      state,
+      initial.level,
+      initial.state,
       (direction) => move.current(direction),
       matchMedia("(prefers-reduced-motion: reduce)").matches,
       () => setReady(true),
@@ -34,7 +39,7 @@ export function GameWorld({ level, state, onMove }: WorldProps) {
       game.destroy(true);
     };
     // Scene lifetime belongs to the mounted world; state flows through render below.
-  }, []);
+  }, [initial]);
   useEffect(() => {
     scene.current?.render(level, state);
   }, [level, state]);

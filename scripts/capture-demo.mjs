@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop -- Browser actions replay a stateful sequence and cannot run concurrently. */
 import { chromium } from "@playwright/test";
 import { rename, mkdir } from "node:fs/promises";
 

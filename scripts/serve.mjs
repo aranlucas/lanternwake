@@ -4,10 +4,11 @@ import { resolve, extname } from "node:path";
 
 const root = resolve("dist");
 
-  const host = process.env.HOST ?? "127.0.0.1";
+const host = process.env.HOST ?? "127.0.0.1";
 
-  const port = Number(process.env.PORT ?? 4317);
+const port = Number(process.env.PORT ?? 4317);
 
+/** @type {Record<string, string>} */
 const types = {
   ".html": "text/html",
   ".js": "text/javascript",
@@ -17,7 +18,8 @@ const types = {
   ".json": "application/json",
 };
 
-const server = createServer(async (req, res) => {
+/** @param {import("node:http").IncomingMessage} req @param {import("node:http").ServerResponse} res */
+async function handleRequest(req, res) {
   if (!["GET", "HEAD"].includes(req.method ?? "")) {
     res.writeHead(405);
     res.end();
@@ -55,7 +57,9 @@ const server = createServer(async (req, res) => {
   }
 
   try {
-    if (!(await stat(path)).isFile()) {throw new Error("not found");}
+    if (!(await stat(path)).isFile()) {
+      throw new Error("not found");
+    }
 
     const body = await readFile(path);
     res.writeHead(200, {
@@ -73,9 +77,17 @@ const server = createServer(async (req, res) => {
     res.writeHead(404);
     res.end("The garden ends here.");
   }
+}
+
+const server = createServer((req, res) => {
+  void handleRequest(req, res).catch(() => {
+    res.writeHead(500);
+    res.end();
+  });
 });
 
 server.listen(port, host, () => console.log(`Lanternwake: http://${host}:${port}`));
 
-for (const signal of ["SIGINT", "SIGTERM"])
-  {process.on(signal, () => server.close(() => process.exit(0)));}
+for (const signal of ["SIGINT", "SIGTERM"]) {
+  process.on(signal, () => server.close(() => process.exit(0)));
+}
