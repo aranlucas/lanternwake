@@ -1,6 +1,6 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
-import { LEVELS } from "../../../src/game/levels.ts";
+import { LEVELS } from "@/game/levels.ts";
 import {
   activePads,
   bridgeOpen,
@@ -8,9 +8,9 @@ import {
   echoPosition,
   initialState,
   transition,
-} from "../../../src/game/simulation.ts";
-import { parseSave } from "../../../src/game/storage.ts";
-import type { Direction, GameAction, GameState, Level } from "../../../src/game/types.ts";
+} from "@/game/simulation.ts";
+import { parseSave } from "@/game/storage.ts";
+import type { Direction, GameAction, GameState, Level } from "@/game/types.ts";
 
 function play(level: Level, paths: Direction[][]): GameState {
   let state = initialState(level);

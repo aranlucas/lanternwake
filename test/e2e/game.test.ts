@@ -1,8 +1,8 @@
 /* eslint-disable no-await-in-loop -- Browser actions replay a stateful sequence and cannot run concurrently. */
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { LEVELS } from "../../src/game/levels.ts";
-import type { Direction } from "../../src/game/types.ts";
+import { LEVELS } from "@/game/levels.ts";
+import type { Direction } from "@/game/types.ts";
 
 const keys: Record<Direction, string> = {
   up: "ArrowUp",
