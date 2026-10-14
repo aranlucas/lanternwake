@@ -18,48 +18,66 @@ export function useGame() {
 
   const [state, setState] = useState<GameState>(saved?.state ?? initialState(LEVELS[0]));
 
-  const [completed, setCompleted] = useState<string[]>(saved?.completed ?? []);
+  const [completed, setCompleted] = useState<string[]>(() => {
+    const restored = saved?.completed ?? [];
+    return saved?.state.won && !restored.includes(saved.state.levelId)
+      ? [...restored, saved.state.levelId]
+      : restored;
+  });
   const [sound, setSound] = useState(false); // Even a saved sound preference needs a fresh user gesture.
   const [storageAvailable, setStorageAvailable] = useState(true);
   const audio = useRef<GardenAudio | null>(null);
   const current = useRef(state);
-  current.current = state;
   const level = levelById(state.levelId);
   useEffect(() => {
-    audio.current = new GardenAudio();
+    const gardenAudio = new GardenAudio();
+    audio.current = gardenAudio;
 
     return () => {
-      void audio.current?.dispose();
+      void gardenAudio.dispose().catch(() => {});
     };
   }, []);
 
   const act = useCallback((action: GameAction) => {
     const before = current.current;
-      const after = transition(levelById(before.levelId), before, action);
+    const after = transition(levelById(before.levelId), before, action);
 
     current.current = after;
     setState(after);
+    if (after.won) {
+      setCompleted((previous) =>
+        previous.includes(after.levelId) ? previous : [...previous, after.levelId],
+      );
+    }
 
     if (action.type === "step" && !before.paused && !before.won) {
       audio.current?.playStep(before, after);
 
-      if (after.won) {audio.current?.play("win");}
-      else if (after.beat === before.beat) {audio.current?.play("blocked");}
+      if (after.won) {
+        audio.current?.play("win");
+      } else if (after.beat === before.beat) {
+        audio.current?.play("blocked");
+      }
     }
 
-    if (action.type === "rewind" && after.echoes.length > before.echoes.length)
-      {audio.current?.play("rewind");}
+    if (action.type === "rewind" && after.echoes.length > before.echoes.length) {
+      audio.current?.play("rewind");
+    }
 
-    if (action.type === "pause" && action.value) {void audio.current?.suspend();}
+    if (action.type === "pause" && action.value) {
+      void audio.current?.suspend().catch(() => {});
+    }
 
-    if (action.type === "restart") {audio.current?.silence();}
+    if (action.type === "restart") {
+      audio.current?.silence();
+    }
   }, []);
 
   const chooseLevel = useCallback((id: string) => {
     const next = initialState(levelById(id));
     current.current = next;
     setState(next);
-    void audio.current?.resume();
+    void audio.current?.resume().catch(() => {});
   }, []);
 
   const toggleSound = async () => {
@@ -74,21 +92,19 @@ export function useGame() {
   };
 
   useEffect(() => {
-    if (state.won)
-      {setCompleted((previous) =>
-        previous.includes(state.levelId) ? previous : [...previous, state.levelId],
-      );}
-  }, [state.won, state.levelId]);
-  useEffect(() => {
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify({ version: 1, state, completed, sound }));
     } catch {
+      // Browser storage errors are only known after writing the latest game state.
+      // eslint-disable-next-line react/set-state-in-effect
       setStorageAvailable(false);
     }
   }, [state, completed, sound]);
   useEffect(() => {
     const visibility = () => {
-      if (document.hidden) {act({ type: "pause", value: true });}
+      if (document.hidden) {
+        act({ type: "pause", value: true });
+      }
     };
 
     document.addEventListener("visibilitychange", visibility);
@@ -98,7 +114,7 @@ export function useGame() {
 
   const resume = () => {
     act({ type: "pause", value: false });
-    void audio.current?.resume();
+    void audio.current?.resume().catch(() => {});
   };
 
   return {

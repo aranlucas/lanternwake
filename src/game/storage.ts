@@ -29,15 +29,23 @@ const saveSchema = z.object({
 });
 
 function parsePath(value: Point[], level: Level): Point[] | null {
-  if (value.length < 1 || value.length > level.maxBeats + 1) {return null;}
+  if (value.length < 1 || value.length > level.maxBeats + 1) {
+    return null;
+  }
 
   const path: Point[] = [];
 
   for (const point of value) {
-    if (!level.map[point.y]?.[point.x] || level.map[point.y][point.x] === "_") {return null;}
+    if (!level.map[point.y]?.[point.x] || level.map[point.y][point.x] === "_") {
+      return null;
+    }
 
-    if (path.length && Math.abs(path.at(-1)!.x - point.x) + Math.abs(path.at(-1)!.y - point.y) > 1)
-      {return null;}
+    if (
+      path.length &&
+      Math.abs(path.at(-1)!.x - point.x) + Math.abs(path.at(-1)!.y - point.y) > 1
+    ) {
+      return null;
+    }
 
     path.push(point);
   }
@@ -66,28 +74,38 @@ function replayPath(level: Level, path: Point[], echoes: Echo[]): GameState | nu
       direction: directionBetween(path[i - 1], path[i]),
     });
 
-    if (state.beat !== i || !samePoint(state.path[i], path[i])) {return null;}
+    if (state.beat !== i || !samePoint(state.path[i], path[i])) {
+      return null;
+    }
   }
 
   return state;
 }
 
 export function parseSave(raw: string | null): SaveData | null {
-  if (!raw || raw.length > 40_000) {return null;}
+  if (!raw || raw.length > 40_000) {
+    return null;
+  }
 
   try {
     const result = saveSchema.safeParse(JSON.parse(raw));
 
-    if (!result.success) {return null;}
+    if (!result.success) {
+      return null;
+    }
 
     const data = result.data;
     const saved = data.state;
 
-    if (!LEVELS.some((level) => level.id === saved.levelId)) {return null;}
+    if (!LEVELS.some((level) => level.id === saved.levelId)) {
+      return null;
+    }
 
-    const level = levelById(String(saved.levelId));
+    const level = levelById(saved.levelId);
 
-    if (saved.echoes.length > level.maxEchoes) {return null;}
+    if (saved.echoes.length > level.maxEchoes) {
+      return null;
+    }
 
     const echoes: Echo[] = [];
 
@@ -99,24 +117,29 @@ export function parseSave(raw: string | null): SaveData | null {
         path.length < 2 ||
         !replayPath(level, path, echoes) ||
         echoes.some((prior) => prior.id === e.id)
-      )
-        {return null;}
+      ) {
+        return null;
+      }
 
-      echoes.push({ id: Number(e.id), path });
+      echoes.push({ id: e.id, path });
     }
 
     const path = parsePath(saved.path, level);
 
-    if (!path) {return null;}
+    if (!path) {
+      return null;
+    }
 
     const state = replayPath(level, path, echoes);
 
-    if (!state || saved.beat !== state.beat || saved.won !== state.won) {return null;}
+    if (!state || saved.beat !== state.beat || saved.won !== state.won) {
+      return null;
+    }
 
     const completed = data.completed.flatMap((id) => {
       const parsed = z.string().safeParse(id);
 
-      return parsed.success && LEVELS.some((level) => level.id === parsed.data)
+      return parsed.success && LEVELS.some((candidate) => candidate.id === parsed.data)
         ? [parsed.data]
         : [];
     });

@@ -41,20 +41,24 @@ export function notesForStep(before: GameState, after: GameState): GardenNote[] 
     before.won ||
     after.beat !== before.beat + 1 ||
     after.path.length !== before.path.length + 1
-  )
-    {return [];}
+  ) {
+    return [];
+  }
 
   const notes: GardenNote[] = [];
 
-  if (!samePoint(currentPosition(before), currentPosition(after)))
-    {notes.push(noteAt(currentPosition(after), 0));}
+  if (!samePoint(currentPosition(before), currentPosition(after))) {
+    notes.push(noteAt(currentPosition(after), 0));
+  }
 
-  before.echoes.slice(0, 3).forEach((echo, index) => {
+  for (const [index, echo] of before.echoes.slice(0, 3).entries()) {
     const from = echoPosition(echo.path, before.beat);
-      const to = echoPosition(echo.path, after.beat);
+    const to = echoPosition(echo.path, after.beat);
 
-    if (!samePoint(from, to)) {notes.push(noteAt(to, index + 1));}
-  });
+    if (!samePoint(from, to)) {
+      notes.push(noteAt(to, index + 1));
+    }
+  }
 
   return notes;
 }

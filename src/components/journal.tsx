@@ -24,9 +24,10 @@ export function Journal({
 }: JournalProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    dialog.current?.showModal();
+    const element = dialog.current;
+    element?.showModal();
 
-    return () => dialog.current?.close();
+    return () => element?.close();
   }, []);
 
   return (

@@ -12,8 +12,8 @@
     "start": "node scripts/serve.mjs",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix",
-    "format": "oxfmt --write",
-    "format:check": "oxfmt --check"
+    "format": "oxfmt --config oxfmt.config.ts --write",
+    "format:check": "oxfmt --config oxfmt.config.ts --check"
   },
   "dependencies": {
     "phaser": "4.2.1",

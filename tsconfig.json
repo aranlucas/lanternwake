@@ -12,7 +12,8 @@
     "verbatimModuleSyntax": true,
     "types": ["node", "vite/client"],
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "allowJs": true
   },
   "include": ["src", "server", "scripts", "tests", "vite.config.ts", "playwright.config.ts"]
 }
