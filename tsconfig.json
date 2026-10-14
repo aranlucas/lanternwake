@@ -15,5 +15,13 @@
     "noUnusedParameters": true,
     "allowJs": true
   },
-  "include": ["src", "server", "scripts", "tests", "vite.config.ts", "playwright.config.ts"]
+  "include": [
+    "src",
+    "server",
+    "scripts",
+    "test",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ]
 }
