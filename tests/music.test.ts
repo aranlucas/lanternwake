@@ -1,4 +1,4 @@
-import test from "node:test";
+import { test } from "vitest";
 import assert from "node:assert/strict";
 import { LEVELS } from "../src/game/levels.ts";
 import { notesForStep } from "../src/game/music.ts";
@@ -24,7 +24,7 @@ function record() {
   return { state: transition(level, state, { type: "rewind" }), tune };
 }
 
-await test("an echo repeats the recorded tune one octave above its keeper, independently of the new route", () => {
+test("an echo repeats the recorded tune one octave above its keeper, independently of the new route", () => {
   const recorded = record();
   let state = recorded.state;
   const heard = [];
@@ -42,7 +42,7 @@ await test("an echo repeats the recorded tune one octave above its keeper, indep
   assert.deepEqual(heard, recorded.tune);
 });
 
-await test("waits leave moving echoes audible; held endpoints and stationary keeper stay silent", () => {
+test("waits leave moving echoes audible; held endpoints and stationary keeper stay silent", () => {
   let state = record().state;
 
   for (let i = 0; i < level.solutions[0].length; i++) {
@@ -58,7 +58,7 @@ await test("waits leave moving echoes audible; held endpoints and stationary kee
   );
 });
 
-await test("blocked moves, rewind, undo, pause and completed states cannot manufacture musical steps", () => {
+test("blocked moves, rewind, undo, pause and completed states cannot manufacture musical steps", () => {
   const initial = initialState(level);
   const first = step(initial, "right");
   const second = step(first, "right");
@@ -84,7 +84,7 @@ await test("blocked moves, rewind, undo, pause and completed states cannot manuf
   assert.deepEqual(notesForStep(first, { ...second, levelId: "other" }), []);
 });
 
-await test("three cooperating echoes form four distinct, bounded musical voices on one beat", () => {
+test("three cooperating echoes form four distinct, bounded musical voices on one beat", () => {
   let state = initialState(level);
 
   for (let i = 0; i < 3; i++) {
