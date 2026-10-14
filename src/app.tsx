@@ -139,11 +139,8 @@ export default function App() {
     if ("serviceWorker" in navigator && import.meta.env.PROD) {
       void navigator.serviceWorker
         .register("/sw.js")
-        .then(async () => {
-          await navigator.serviceWorker.ready;
-          setCacheReady(true);
-          return undefined;
-        })
+        .then(() => navigator.serviceWorker.ready)
+        .then(() => setCacheReady(true))
         .catch(() => setCacheReady(false));
     }
 
@@ -168,6 +165,7 @@ export default function App() {
         </div>
         <nav aria-label="Game settings">
           <button
+            type="button"
             className="icon-button"
             aria-label={sound ? "Mute sound" : "Enable sound"}
             onClick={() => void toggleSound()}
@@ -176,6 +174,7 @@ export default function App() {
             <Icon name={sound ? "sound" : "mute"} size={23} />
           </button>
           <button
+            type="button"
             className="icon-button"
             aria-label="Pause game"
             onClick={() => act({ type: "pause", value: true })}
@@ -183,6 +182,7 @@ export default function App() {
             <Icon name="pause" size={22} />
           </button>
           <button
+            type="button"
             className="icon-button"
             aria-label="Open journal"
             onClick={() => {
@@ -231,7 +231,7 @@ export default function App() {
             <Icon name="lantern" size={40} />
             <h2 id="pause-title">The garden can wait.</h2>
             <p>Your echoes are right where you left them.</p>
-            <button className="resume-button" onClick={resume}>
+            <button type="button" className="resume-button" onClick={resume}>
               Keep wandering
             </button>
           </div>
@@ -244,6 +244,7 @@ export default function App() {
             <h2 id="win-title">{final ? "You brought the morning." : "A little more morning."}</h2>
             <p>{level.story}</p>
             <button
+              type="button"
               className="resume-button"
 
               onClick={() => {
@@ -255,6 +256,7 @@ export default function App() {
               <Icon name="right" />
             </button>
             <button
+              type="button"
               className="text-button"
               onClick={() => {
                 act({ type: "pause", value: true });

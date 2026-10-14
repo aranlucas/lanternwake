@@ -49,4 +49,4 @@ await rename(path, "evidence/lanternwake-demo.webm");
 
 await browser.close();
 
-console.log("Captured evidence/lanternwake-demo.webm");
+process.stdout.write("Captured evidence/lanternwake-demo.webm\n");

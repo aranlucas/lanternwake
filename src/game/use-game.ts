@@ -20,10 +20,12 @@ export function useGame() {
 
   const [completed, setCompleted] = useState<string[]>(() => {
     const restored = saved?.completed ?? [];
+
     return saved?.state.won && !restored.includes(saved.state.levelId)
       ? [...restored, saved.state.levelId]
       : restored;
   });
+
   const [sound, setSound] = useState(false); // Even a saved sound preference needs a fresh user gesture.
   const [storageAvailable, setStorageAvailable] = useState(true);
   const audio = useRef<GardenAudio | null>(null);
@@ -44,6 +46,7 @@ export function useGame() {
 
     current.current = after;
     setState(after);
+
     if (after.won) {
       setCompleted((previous) =>
         previous.includes(after.levelId) ? previous : [...previous, after.levelId],

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { currentPosition } from "../game/simulation.ts";
 import { createGarden, GardenScene } from "../game/renderer.ts";
 import type { Direction, GameState, Level } from "../game/types.ts";
 
@@ -20,7 +21,7 @@ export function GameWorld({ level, state, onMove }: WorldProps) {
   }, [onMove]);
   useEffect(() => {
     if (!host.current) {
-      return undefined;
+      throw new Error("Missing garden host");
     }
 
     const garden = new GardenScene(
@@ -44,11 +45,13 @@ export function GameWorld({ level, state, onMove }: WorldProps) {
     scene.current?.render(level, state);
   }, [level, state]);
 
+  const position = currentPosition(state);
+
   return (
     <div
       className="world"
       role="img"
-      aria-label={`${level.title}. You are at column ${state.path.at(-1)!.x}, row ${state.path.at(-1)!.y}. ${state.echoes.length} echoes. ${state.won ? "Room complete." : "Use the direction controls to move."}`}
+      aria-label={`${level.title}. You are at column ${position.x}, row ${position.y}. ${state.echoes.length} echoes. ${state.won ? "Room complete." : "Use the direction controls to move."}`}
     >
       <div className="canvas-host" ref={host} />
       {!ready && (

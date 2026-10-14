@@ -14,6 +14,7 @@ export function Controls({ level, state, onAction }: ControlsProps) {
     <div className="controls">
       <div className="main-controls">
         <button
+          type="button"
           className="rewind"
           onClick={() => onAction({ type: "rewind" })}
           disabled={locked || state.beat === 0 || state.echoes.length >= level.maxEchoes}
@@ -22,17 +23,22 @@ export function Controls({ level, state, onAction }: ControlsProps) {
           Rewind & leave an echo
         </button>
         <button
+          type="button"
           onClick={() => onAction({ type: "step", direction: "wait" })}
           disabled={locked || state.beat === level.maxBeats}
         >
           <Icon name="wait" />
           Wait
         </button>
-        <button onClick={() => onAction({ type: "undo" })} disabled={locked || state.beat === 0}>
+        <button
+          type="button"
+          onClick={() => onAction({ type: "undo" })}
+          disabled={locked || state.beat === 0}
+        >
           <Icon name="undo" />
           Undo step
         </button>
-        <button onClick={() => onAction({ type: "restart" })}>
+        <button type="button" onClick={() => onAction({ type: "restart" })}>
           <Icon name="restart" />
           Restart
         </button>
@@ -40,6 +46,7 @@ export function Controls({ level, state, onAction }: ControlsProps) {
       <div className="touch-controls" aria-label="Direction controls">
         {(["up", "left", "down", "right"] as const).map((direction) => (
           <button
+            type="button"
             className={`direction ${direction}`}
             key={direction}
             aria-label={`Move ${direction}`}
@@ -51,7 +58,7 @@ export function Controls({ level, state, onAction }: ControlsProps) {
         ))}
       </div>
       {state.echoes.length > 0 && !locked && (
-        <button className="undo-echo" onClick={() => onAction({ type: "undo-echo" })}>
+        <button type="button" className="undo-echo" onClick={() => onAction({ type: "undo-echo" })}>
           Take back your last echo
         </button>
       )}
