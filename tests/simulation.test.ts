@@ -1,4 +1,4 @@
-import test from "node:test";
+import { test } from "vitest";
 import assert from "node:assert/strict";
 import { LEVELS } from "../src/game/levels.ts";
 import {
@@ -34,31 +34,27 @@ function play(level: Level, paths: Direction[][]): GameState {
   return state;
 }
 
-await Promise.all(
-  LEVELS.map((level) =>
-    test(`${level.title}: authored solution cooperates with all required echoes`, () => {
-      const state = play(level, level.solutions);
-      assert.equal(state.won, true);
-      assert.deepEqual(currentPosition(state), level.goal);
-      assert.equal(activePads(level, state).length, level.pads.length);
-      assert.equal(state.echoes.length, level.solutions.length - 1);
+test.each(LEVELS)("$title: authored solution cooperates with all required echoes", (level) => {
+  const state = play(level, level.solutions);
+  assert.equal(state.won, true);
+  assert.deepEqual(currentPosition(state), level.goal);
+  assert.equal(activePads(level, state).length, level.pads.length);
+  assert.equal(state.echoes.length, level.solutions.length - 1);
 
-      const saved = parseSave(
-        JSON.stringify({
-          version: 1,
-          state,
-          completed: [level.id],
-          sound: false,
-        }),
-      );
-
-      assert.ok(saved, "Winning state must round-trip through validated local persistence");
-      assert.equal(saved.state.won, true);
+  const saved = parseSave(
+    JSON.stringify({
+      version: 1,
+      state,
+      completed: [level.id],
+      sound: false,
     }),
-  ),
-);
+  );
 
-await test("a player cannot hold a pad while crossing its gate alone", () => {
+  assert.ok(saved, "Winning state must round-trip through validated local persistence");
+  assert.equal(saved.state.won, true);
+});
+
+test("a player cannot hold a pad while crossing its gate alone", () => {
   const level = LEVELS[0];
   let state = initialState(level);
   state = transition(level, state, { type: "step", direction: "right" });
@@ -74,7 +70,7 @@ await test("a player cannot hold a pad while crossing its gate alone", () => {
   assert.equal(blocked.echoes.length, 0);
 });
 
-await test("echo replays exact recorded positions and holds its final position", () => {
+test("echo replays exact recorded positions and holds its final position", () => {
   const level = LEVELS[0];
   const state = play(level, [level.solutions[0]]);
 
@@ -85,7 +81,7 @@ await test("echo replays exact recorded positions and holds its final position",
   assert.deepEqual(echoPosition(rewound.echoes[0].path, 16), { x: 3, y: 3 });
 });
 
-await test("moon bridge refuses sleeping-beat crossing without advancing time", () => {
+test("moon bridge refuses sleeping-beat crossing without advancing time", () => {
   const level = LEVELS[2];
   let state = play(level, [level.solutions[0]]);
   state = transition(level, state, { type: "rewind" });
@@ -113,7 +109,7 @@ await test("moon bridge refuses sleeping-beat crossing without advancing time", 
   ]);
 });
 
-await test("pause freezes movement/rewinds; restart clears echoes; undo restores synchronized beat", () => {
+test("pause freezes movement/rewinds; restart clears echoes; undo restores synchronized beat", () => {
   const level = LEVELS[0];
   let state = play(level, [level.solutions[0]]);
   const paused = transition(level, state, { type: "pause", value: true });
@@ -131,7 +127,7 @@ await test("pause freezes movement/rewinds; restart clears echoes; undo restores
   assert.deepEqual(transition(level, paused, { type: "restart" }), initialState(level));
 });
 
-await test("empty echoes and the fourth echo are refused; full beat budget remains undoable", () => {
+test("empty echoes and the fourth echo are refused; full beat budget remains undoable", () => {
   const level = LEVELS[0];
   let state = initialState(level);
   assert.equal(transition(level, state, { type: "rewind" }).echoes.length, 0);
@@ -153,7 +149,7 @@ await test("empty echoes and the fourth echo are refused; full beat budget remai
 const make = (replacement: GameState) =>
   JSON.stringify({ version: 1, state: replacement, completed: [] });
 
-await test("save validation rejects malformed, teleporting, stale-version, forged and oversized states", () => {
+test("save validation rejects malformed, teleporting, stale-version, forged and oversized states", () => {
   const state = initialState(LEVELS[0]);
 
   assert.equal(parseSave("not json"), null);
@@ -173,7 +169,7 @@ await test("save validation rejects malformed, teleporting, stale-version, forge
   );
 });
 
-await test("deterministic replay holds across duplicate randomized action runs", () => {
+test("deterministic replay holds across duplicate randomized action runs", () => {
   let seed = 42;
 
   const random = () => {
@@ -213,7 +209,7 @@ await test("deterministic replay holds across duplicate randomized action runs",
   }
 });
 
-await test("save boundary preserves filtering and rejects malformed coordinates without coercion", () => {
+test("save boundary preserves filtering and rejects malformed coordinates without coercion", () => {
   const state = initialState(LEVELS[0]);
 
   const save = (replacement: GameState) =>
