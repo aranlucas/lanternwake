@@ -1,9 +1,9 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
-import { LEVELS } from "../src/game/levels.ts";
-import { notesForStep } from "../src/game/music.ts";
-import { initialState, transition } from "../src/game/simulation.ts";
-import type { Direction, GameState } from "../src/game/types.ts";
+import { LEVELS } from "../../../src/game/levels.ts";
+import { notesForStep } from "../../../src/game/music.ts";
+import { initialState, transition } from "../../../src/game/simulation.ts";
+import type { Direction, GameState } from "../../../src/game/types.ts";
 
 const level = LEVELS[0];
 
