@@ -38,3 +38,9 @@ jobs:
 
           - name: Typecheck and build
             run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium --only-shell
+
+      - name: Run browser tests
+        run: pnpm run test:e2e
