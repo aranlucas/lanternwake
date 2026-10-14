@@ -13,7 +13,11 @@
     "types": ["node", "vite/client"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "allowJs": true
+    "allowJs": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@test/*": ["./test/*"]
+    }
   },
   "include": [
     "src",
