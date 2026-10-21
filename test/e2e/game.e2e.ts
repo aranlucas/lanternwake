@@ -274,7 +274,7 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
         const context: unknown = Reflect.construct(target, args);
 
         if (!(context instanceof NativeAudioContext)) {
-          throw new Error("Expected native AudioContext");
+          throw new TypeError("Expected native AudioContext");
         }
 
         trace.contexts.push(context);

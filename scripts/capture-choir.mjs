@@ -16,7 +16,7 @@ try {
         const context = Reflect.construct(target, args);
 
         if (!(context instanceof NativeAudioContext)) {
-          throw new Error("Expected native AudioContext");
+          throw new TypeError("Expected native AudioContext");
         }
 
         const output = context.createMediaStreamDestination();
