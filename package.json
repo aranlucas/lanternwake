@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "husky",
     "dev": "portless run vite",
-    "build": "tsc -b && vite build && node scripts/build-cache.mjs",
+    "build": "tsc -b && vite build",
     "check": "pnpm lint && tsc -b && pnpm test",
     "test": "vitest run",
     "test:e2e": "playwright test",
@@ -37,6 +37,7 @@
     "portless": "0.15.8",
     "typescript": "7.0.2",
     "vite": "8.3.5",
+    "vite-plugin-pwa": "2.0.0",
     "vitest": "5.0.5"
   },
   "lint-staged": {

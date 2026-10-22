@@ -76,7 +76,7 @@ echo replay, mute/pause cleanup, and the limit on simultaneous voices.
 - `src/game/storage.ts`: save validation by replaying each stored path.
 - `src/game/use-game.ts`: local persistence, lifecycle, and audio integration.
 - `src/components/`: accessible DOM controls, timeline, journal, and world shell.
-- `scripts/build-cache.mjs`: hashed service-worker cache generated from all build files.
+- `vite.config.ts`: `vite-plugin-pwa` generates the Workbox service worker that precaches every build file.
 - `scripts/serve.mjs`: dependency-free local/static HTTP server with `/health`.
 
 ## Hosting scaffold and limits
