@@ -16,7 +16,7 @@ AI requests, or remote gameplay services.
 
 ## Play locally
 
-Requires Node.js 24+ and pnpm 12.8.1.
+Requires Node.js 24+ and the pnpm version pinned in `package.json`.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -51,10 +51,12 @@ the game. Foreground return needs a deliberate resume.
 ## Verification
 
 ```sh
-pnpm check       # TypeScript + 15 deterministic unit/property tests
+pnpm check       # Lint, TypeScript, and deterministic unit/property tests
 pnpm build      # Production assets + content-versioned offline cache
-pnpm test:e2e   # Six full Chromium interaction tests, one worker
+pnpm test:e2e   # Full Chromium interaction tests, one worker
 ```
+
+The Node unit suite uses its own Vitest configuration and does not initialize Phaser, React, or the production service-worker build. Production/offline behavior is verified by the build and browser suite.
 
 Install a browser only if it is absent: `pnpm exec playwright install chromium`.
 All four room solutions run through actual keyboard input in browser tests.
