@@ -12,8 +12,6 @@ Commands, run sequentially:
 pnpm check
 pnpm build
 pnpm test:e2e
-node scripts/capture-demo.mjs
-node scripts/capture-choir.mjs
 ```
 
 `pnpm check`: TypeScript passes and **15/15 unit/property tests** pass, including
@@ -80,7 +78,7 @@ mobile controls differ intentionally so the game actually works.
 - `evidence/mobile.png`: touch-ready responsive view.
 - `evidence/morning.png`: completed final room.
 - `evidence/lanternwake-demo.webm`: short real gameplay recording.
-- `evidence/echo-choir.wav`: real synthesizer output from a complete two-echo room; 48 kHz stereo PCM, checked for nonzero signal. Reproduce with `node scripts/capture-choir.mjs` while the local server runs. No microphone is accessed.
+- `evidence/echo-choir.wav`: real synthesizer output from a complete two-echo room; 48 kHz stereo PCM, checked for nonzero signal. This is a retained capture artifact. The normal Playwright audio test verifies nonzero rendered audio without a capture script or microphone access.
 
 Library saves succeeded for the first-echo screenshot, mobile screenshot and
 video. Exact Library identifiers are provided separately to the parent for

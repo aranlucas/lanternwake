@@ -17,6 +17,8 @@ type AudioTrace = {
   starts: { frequency: number; waveform: OscillatorType }[];
   active: Set<OscillatorNode>;
   maxActive: number;
+  recorder: MediaRecorder | null;
+  chunks: Blob[];
 };
 
 declare global {
@@ -265,6 +267,8 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
       starts: [],
       active: new Set(),
       maxActive: 0,
+      recorder: null,
+      chunks: [],
     };
 
     window.audioTrace = trace;
@@ -278,6 +282,18 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
         }
 
         trace.contexts.push(context);
+        const output = context.createMediaStreamDestination();
+        const createPanner = context.createStereoPanner.bind(context);
+        context.createStereoPanner = () => {
+          const panner = createPanner();
+          panner.connect(output);
+
+          return panner;
+        };
+
+        trace.recorder = new MediaRecorder(output.stream);
+        trace.recorder.ondataavailable = (event) => trace.chunks.push(event.data);
+        trace.recorder.start();
         const create = context.createOscillator.bind(context);
         context.createOscillator = () => {
           const oscillator = create();
@@ -333,6 +349,35 @@ test("real Web Audio plays recorded echo voices only after opt-in and stops on p
   expect(echoes[1].frequency).toBeCloseTo(keeper[0].frequency * 2, 3);
   await steps(page, ["wait"]);
   expect(await page.evaluate(() => window.audioTrace.starts.length)).toBe(2);
+  // Verify actual rendered samples, rather than only oscillator scheduling.
+  await page.waitForTimeout(300);
+
+  const peak = await page.evaluate(async () => {
+    const trace = window.audioTrace;
+    const recorder = trace.recorder;
+
+    if (!recorder) {
+      throw new Error("Expected the opt-in audio recorder");
+    }
+
+    await new Promise<void>((resolve) => {
+      recorder.onstop = () => resolve();
+      recorder.stop();
+    });
+    const encoded = await new Blob(trace.chunks).arrayBuffer();
+    const audio = await trace.contexts[0].decodeAudioData(encoded);
+    let maximum = 0;
+
+    for (let channel = 0; channel < audio.numberOfChannels; channel++) {
+      for (const sample of audio.getChannelData(channel)) {
+        maximum = Math.max(maximum, Math.abs(sample));
+      }
+    }
+
+    return maximum;
+  });
+
+  expect(peak, "The opted-in synthesizer must render a non-silent signal").toBeGreaterThan(0.001);
   await page.getByRole("button", { name: "Pause game" }).click();
   await expect
     .poll(() => page.evaluate(() => window.audioTrace.contexts[0].state))
