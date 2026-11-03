@@ -56,44 +56,26 @@ pnpm build      # Production assets + content-versioned offline cache
 pnpm test:e2e   # Full Chromium interaction tests, one worker
 ```
 
-The Node unit suite uses its own Vitest configuration and does not initialize Phaser, React, or the production service-worker build. Production/offline behavior is verified by the build and browser suite.
-
 Install a browser only if it is absent: `pnpm exec playwright install chromium`.
-All four room solutions run through actual keyboard input in browser tests.
-The tests also cover touch controls, pause/reset/undo, echo recovery, sound
-opt-in, validated saves, reduced motion, offline reload with artwork, and
-keyboard focus/Escape behavior in pause and completion dialogs.
-The audio test observes real oscillator pitches, gesture-only creation,
-echo replay, mute/pause cleanup, and the limit on simultaneous voices.
+The browser suite uses the production build, so run the commands in order.
 
 [Gameplay clip](evidence/lanternwake-demo.webm) · [Mobile screenshot](evidence/mobile.png)
-· [Research and concept comparison](docs/research.md) · [QA evidence](docs/verification.md)
-
-## Structure
-
-- `src/game/simulation.ts`: pure deterministic transition rules.
-- `src/game/music.ts`: pure route-to-note composition; `audio.ts` synthesizes it locally.
-- `src/game/levels.ts`: authored maps, dependencies, hints, and verified solutions.
-- `src/game/renderer.ts`: Phaser scene, original atlas frames, movement tweens.
-- `src/game/storage.ts`: save validation by replaying each stored path.
-- `src/game/use-game.ts`: local persistence, lifecycle, and audio integration.
-- `src/components/`: accessible DOM controls, timeline, journal, and world shell.
-- `vite.config.ts`: `vite-plugin-pwa` generates the Workbox service worker that precaches every build file.
-- `scripts/serve.mjs`: dependency-free local/static HTTP server with `/health`.
+· [Design rationale and experiments](docs/research.md) · [Artwork provenance](docs/assets.md)
+· [Feature roadmap](ROADMAP.md)
 
 ## Hosting scaffold and limits
 
 Dockerfile and `railway.toml` are provided for a future Railway deployment.
-Nothing has been provisioned or deployed. The build is static and can also be
-served by Cloudflare with a private access policy. Keep any future hosted demo
-private; the prototype itself has no server authentication.
+The build is static. Keep any hosted demo private behind an access policy;
+the prototype itself has no server authentication. Deployment requires explicit
+authorization.
 
 The scope is a short toy, not a full game: four rooms, no level editor, no cloud
-sync, no real-time co-op, and no gamepad support. Chromium was verified;
-Safari/Firefox and physical touch devices remain untested. Audio control and
-context activation were tested, but its artistic balance still needs human
-listening. The first load includes about 5.3 MiB of PNG artwork and a 1.44 MB
-JavaScript bundle; subsequent offline play uses the cached files.
+sync, no real-time co-op, and no gamepad support. Browser tests target Chromium.
+Safari/Firefox, physical touch devices, and the Docker/Railway runtime have no
+recorded validation. Audio balance still needs human listening, and the game
+has not had a complete screen-reader gameplay audit. Echo readability on a
+Canvas fallback also needs checking because tint may differ from WebGL.
 
 The time-loop mechanic has prior art. Lanternwake's experiment is its quiet,
 turn-based, position-replay interpretation and atmosphere. See the research
