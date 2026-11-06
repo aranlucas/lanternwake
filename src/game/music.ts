@@ -33,7 +33,6 @@ function noteAt(point: Point, voice: number): GardenNote {
   };
 }
 
-/** Only an accepted forward beat creates music. Waiting gives moving echoes the floor. */
 export function notesForStep(before: GameState, after: GameState): GardenNote[] {
   if (
     before.levelId !== after.levelId ||

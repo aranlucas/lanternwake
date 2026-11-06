@@ -3,11 +3,17 @@ import type { ReactNode } from "react";
 
 type GameDialogProps = {
   labelId: string;
+  className?: string;
   onDismiss?: () => void;
   children: ReactNode;
 };
 
-export function GameDialog({ labelId, onDismiss, children }: GameDialogProps) {
+export function GameDialog({
+  labelId,
+  className = "game-dialog",
+  onDismiss,
+  children,
+}: GameDialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const element = dialog.current;
@@ -19,7 +25,7 @@ export function GameDialog({ labelId, onDismiss, children }: GameDialogProps) {
   return (
     <dialog
       ref={dialog}
-      className="game-dialog"
+      className={className}
       aria-labelledby={labelId}
       onKeyDown={(event) => {
         if (event.key !== "Tab") {

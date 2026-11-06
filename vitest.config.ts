@@ -4,7 +4,6 @@ import { configDefaults, defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: { tsconfigPaths: true },
   test: {
-    // Browser tests retain their single-worker Playwright runner.
     exclude: [...configDefaults.exclude, "test/e2e/**"],
   },
 });

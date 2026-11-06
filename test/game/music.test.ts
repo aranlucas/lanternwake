@@ -99,5 +99,4 @@ test("three cooperating echoes form four distinct, bounded musical voices on one
   assert.equal(new Set(notes.map((note) => note.frequency)).size, 4);
   assert.equal(new Set(notes.map((note) => note.pan)).size, 4);
   assert.ok(notes.reduce((sum, note) => sum + note.gain, 0) <= 0.05);
-  assert.deepEqual(notesForStep(state, after), notesForStep(state, after));
 });

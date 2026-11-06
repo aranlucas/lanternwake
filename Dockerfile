@@ -2,7 +2,7 @@ FROM node:24.22.1-alpine AS build
 WORKDIR /app
 RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
-RUN corepack prepare pnpm@12.8.1 --activate && pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 FROM node:24.22.1-alpine

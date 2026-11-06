@@ -8,7 +8,6 @@ type Voice = {
   pan: StereoPannerNode;
 };
 
-// Gesture-created local synthesis. No samples, autoplay, wall-clock game rules or network.
 export class GardenAudio {
   private context: AudioContext | null = null;
   private voices = new Set<Voice>();
@@ -68,7 +67,6 @@ export class GardenAudio {
       return;
     }
 
-    // Rapid input stays bounded; cancel the oldest voice rather than accumulating nodes.
     while (this.voices.size >= 16) {
       const oldest = this.voices.values().next();
 

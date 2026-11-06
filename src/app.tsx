@@ -11,7 +11,7 @@ import { useGame } from "./game/use-game.ts";
 import type { Direction, GameState, Level } from "./game/types.ts";
 
 function guidance(level: Level, state: GameState): string {
-  if (state.message && state.message !== "Every step is a moment you can borrow.") {
+  if (state.message) {
     return state.message;
   }
 
@@ -23,12 +23,10 @@ function guidance(level: Level, state: GameState): string {
     return level.hints[0];
   }
 
-  if (level.id === "company") {
-    return "Your echo keeps the light. Walk through the gate to the bell.";
-  }
+  const authoredGuidance = level.echoGuidance?.[state.echoes.length] ?? level.echoGuidance?.default;
 
-  if (level.id === "beat" && state.echoes.length === 1) {
-    return "Find the star pad across the moon bridge. Wait for its bright beats.";
+  if (authoredGuidance) {
+    return authoredGuidance;
   }
 
   if (state.echoes.length < level.pads.length) {
@@ -199,7 +197,7 @@ export default function App() {
         <div className="guidance" role="status" aria-live="polite">
           {guidance(level, state)}
         </div>
-        {level.id === "beat" && (
+        {level.map.some((row) => row.includes("p")) && (
           <p className="bridge-rhythm">
             Moon bridge: <span>{bridgeOpen(state.beat) ? "awake" : "asleep"}</span> · two beats
             bright, two beats quiet

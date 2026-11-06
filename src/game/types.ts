@@ -19,6 +19,7 @@ export type Level = {
   maxBeats: number;
   maxEchoes: number;
   hints: string[];
+  echoGuidance?: Partial<Record<number, string>> & { default?: string };
   solutions: Direction[][];
 };
 
