@@ -89,6 +89,11 @@ test("neighboring lower stones accept pointer input through the decorative foote
   await screen.getByRole("button", "Open journal").tap();
   await screen.getByRole("button", /The last light/).tap();
   await browser.keyboard.press("ArrowRight");
+  await browser.keyboard.press("ArrowRight");
+  await screen.getByRole("button", "Rewind & leave an echo").tap();
+  await expect(screen.getByTestId("echo-count")).toHaveText("1 echo beside you");
+  await expect(screen.getByRole("button", "Take back your last echo")).toBeVisible();
+  await browser.keyboard.press("ArrowRight");
   await browser.keyboard.press("ArrowDown");
   await expect(screen.getByTestId("state")).toHaveAttribute("data-y", "4");
 

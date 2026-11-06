@@ -90,3 +90,22 @@ padding. README promises adjacent-stone pointer movement. Add an actual
 pointer regression at the rendered stone center and save pre-fix CI evidence.
 Treat this as a candidate until CI demonstrates blocked movement; do not
 change layout or styles speculatively.
+
+### First CI execution and stronger pointer reproduction
+
+[CI run 42303373515](https://github.com/aranlucas/lanternwake/actions/runs/42303373515)
+at `d6969bc091ba5e39cd73927b830361860d64b877` passed lint/types, formatting,
+production build, all 16 unit tests, all six existing Playwright flows and all
+three new tester-army journeys. The new suite ran `e2e v0.23.0` with one
+Chromium worker, no model and telemetry disabled. Reports and a screenshot
+were uploaded as `browser-evidence`.
+
+The initial pointer flow passed with no recorded echo. That does not establish
+the reviewer's specific overlap condition: the echo-recovery button increases
+the footer height. Extend this flow to record an echo and positively assert
+that button is visible before clicking the lower stone. Retain the same
+expected next beat/position. No game or CSS changes before this CI result.
+
+Independent whole-repository and integration reviews completed with no other
+concrete worthwhile findings. The installed guide/types confirm the config,
+viewport, initialization, reload, storage injection and locator APIs used.
