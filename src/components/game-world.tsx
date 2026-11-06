@@ -39,7 +39,6 @@ export function GameWorld({ level, state, onMove }: WorldProps) {
       scene.current = null;
       game.destroy(true);
     };
-    // Scene lifetime belongs to the mounted world; state flows through render below.
   }, [initial]);
   useEffect(() => {
     scene.current?.render(level, state);

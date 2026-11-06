@@ -61,7 +61,7 @@ export function initialState(level: Level): GameState {
     beat: 0,
     won: false,
     paused: false,
-    message: "Every step is a moment you can borrow.",
+    message: "",
     loops: 0,
   };
 }

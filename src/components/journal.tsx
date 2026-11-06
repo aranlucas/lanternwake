@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
 import { LEVELS } from "../game/levels.ts";
 import type { Level } from "../game/types.ts";
+import { GameDialog } from "./game-dialog.tsx";
 import { Icon } from "./icon.tsx";
 
 type JournalProps = {
@@ -22,16 +22,8 @@ export function Journal({
   onClose,
   onChoose,
 }: JournalProps) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const element = dialog.current;
-    element?.showModal();
-
-    return () => element?.close();
-  }, []);
-
   return (
-    <dialog ref={dialog} className="journal" onCancel={onClose} aria-labelledby="journal-title">
+    <GameDialog className="journal" onDismiss={onClose} labelId="journal-title">
       <button
         type="button"
         className="dialog-close icon-button"
@@ -90,6 +82,6 @@ export function Journal({
       <button type="button" className="resume-button" onClick={onClose}>
         Back to the garden
       </button>
-    </dialog>
+    </GameDialog>
   );
 }

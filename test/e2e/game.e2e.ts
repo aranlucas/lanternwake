@@ -61,8 +61,6 @@ test("first echo reveals the mechanic and all four rooms finish through keyboard
   });
   await open(page);
   await expect(page).toHaveTitle(/Lanternwake/);
-  await page.waitForTimeout(200);
-  await page.screenshot({ path: "evidence/desktop.png", fullPage: true });
 
   for (const [chapter, level] of LEVELS.entries()) {
     await expect(page.getByTestId("state")).toHaveAttribute("data-level", level.id);
@@ -73,28 +71,10 @@ test("first echo reveals the mechanic and all four rooms finish through keyboard
       if (index < level.solutions.length - 1) {
         await page.keyboard.press("r");
         await expect(page.getByTestId("state")).toHaveAttribute("data-echoes", String(index + 1));
-
-        if (chapter === 0) {
-          await page.keyboard.press("ArrowRight");
-          await page.keyboard.press("ArrowRight");
-          await page.keyboard.press("ArrowRight");
-          await page.waitForTimeout(220);
-          await page.screenshot({
-            path: "evidence/first-echo.png",
-            fullPage: true,
-          });
-          await page.keyboard.press("z");
-          await page.keyboard.press("z");
-          await page.keyboard.press("z");
-        }
       }
     }
 
     await expect(page.getByTestId("state")).toHaveAttribute("data-won", "true");
-
-    if (chapter === 3) {
-      await page.screenshot({ path: "evidence/morning.png", fullPage: true });
-    }
 
     await page
       .getByRole("button", {
@@ -192,8 +172,6 @@ test("mobile touch controls finish a room and reduced-motion layout does not ove
   await page.getByRole("button", { name: "Rewind & leave an echo", exact: true }).click();
   await right.click();
   await right.click();
-  await page.waitForTimeout(100);
-  await page.screenshot({ path: "evidence/mobile.png", fullPage: true });
 
   for (let i = 0; i < 4; i++) {
     await right.click();
@@ -213,6 +191,16 @@ test("native game dialogs contain focus and Escape resumes only the pause screen
   page,
 }) => {
   await open(page);
+  await page.getByRole("button", { name: "Open journal", exact: true }).click();
+  const closeJournal = page.getByRole("button", { name: "Close journal" });
+  await expect(closeJournal).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(page.getByRole("button", { name: "Back to the garden" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(closeJournal).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByTestId("state")).toHaveAttribute("data-paused", "false");
   await steps(page, ["right"]);
   await page.getByRole("button", { name: "Pause game" }).click();
   const resume = page.getByRole("button", { name: "Keep wandering" });

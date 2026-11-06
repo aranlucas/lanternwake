@@ -3,6 +3,9 @@ import type { Level } from "./types.ts";
 export const LEVELS: Level[] = [
   {
     id: "company",
+    echoGuidance: {
+      default: "Your echo keeps the light. Walk through the gate to the bell.",
+    },
     title: "A little company",
     subtitle: "One light. Two of you.",
     story: "The garden has been waiting for someone. Perhaps it was waiting for you, twice.",
@@ -70,6 +73,9 @@ export const LEVELS: Level[] = [
   },
   {
     id: "beat",
+    echoGuidance: {
+      1: "Find the star pad across the moon bridge. Wait for its bright beats.",
+    },
     title: "A borrowed beat",
     subtitle: "Even bridges have a rhythm.",
     story: "The moon bridge breathes in two beats, out two beats. Listen with your feet.",

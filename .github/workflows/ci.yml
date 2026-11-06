@@ -31,15 +31,14 @@ jobs:
           cache: true
           require-lockfile: true
 
-      - parallel:
-          - name: Lint
-            run: pnpm lint && pnpm format:check
+      - name: Check lint, types, and deterministic behavior
+        run: pnpm check
 
-          - name: Test
-            run: pnpm test
+      - name: Check formatting
+        run: pnpm format:check
 
-          - name: Typecheck and build
-            run: pnpm build
+      - name: Build production game
+        run: pnpm build
 
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium --only-shell
