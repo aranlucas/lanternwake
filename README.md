@@ -16,7 +16,7 @@ AI requests, or remote gameplay services.
 
 ## Play locally
 
-Requires Node.js 24+ and the pnpm version pinned in `package.json`.
+Requires Node.js 24.8+ and the pnpm version pinned in `package.json`.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -54,10 +54,14 @@ the game. Foreground return needs a deliberate resume.
 pnpm check       # Lint, TypeScript, and deterministic unit/property tests
 pnpm build      # Production assets + content-versioned offline cache
 pnpm test:e2e   # Full Chromium interaction tests, one worker
+pnpm test:journeys # Deterministic tester-army/e2e save/recovery journeys, one worker
 ```
 
 Install a browser only if it is absent: `pnpm exec playwright install chromium`.
-The browser suite uses the production build, so run the commands in order.
+Both browser suites use the production build, so run the commands in order.
+The pinned `e2e` and `@e2e-dev/web` packages drive deterministic controls and
+assertions with no model calls or credentials. CI disables framework telemetry
+and uploads failure traces and reports.
 
 [Gameplay clip](evidence/lanternwake-demo.webm) · [Mobile screenshot](evidence/mobile.png)
 · [Design rationale and experiments](docs/research.md) · [Artwork provenance](docs/assets.md)
